@@ -32,7 +32,6 @@ public static class TownBuilder
         new Spec { name = "Bld_Blacksmith", cellsX = 3, cellsZ = 3, wall = "Wall_UnevenBrick_Straight", doorWall = "Wall_UnevenBrick_Door_Flat", windowWall = "Wall_UnevenBrick_Window_Wide_Flat", greybox = "Blacksmith", facingY = -90f },
         new Spec { name = "Bld_Shop",       cellsX = 3, cellsZ = 3, wall = "Wall_Plaster_Straight",     doorWall = "Wall_Plaster_Door_Flat",     windowWall = "Wall_Plaster_Window_Wide_Flat",     greybox = "Shop",       facingY = 90f },
         new Spec { name = "Bld_Inn",        cellsX = 3, cellsZ = 4, wall = "Wall_Plaster_Straight",     doorWall = "Wall_Plaster_Door_Flat",     windowWall = "Wall_Plaster_Window_Wide_Flat",     greybox = "Inn",        facingY = -90f },
-        new Spec { name = "Bld_House",      cellsX = 2, cellsZ = 2, wall = "Wall_Plaster_Straight",     doorWall = "Wall_Plaster_Door_Flat",     windowWall = "Wall_Plaster_Window_Wide_Flat",     greybox = "House",      facingY = 90f },
     };
 
     [MenuItem("GrimHollow/Build Town Buildings")]
@@ -120,6 +119,13 @@ public static class TownBuilder
         // 지붕: Roof_RoundTiles_(가로m)x(세로m)
         Add(root.transform, "Roof_RoundTiles_" + (spec.cellsX * 2) + "x" + (spec.cellsZ * 2), new Vector3(0f, WallHeight, 0f), 0f);
 
+        // 지붕 앞뒤 삼각형 벽 (없으면 지붕 속이 뚫려 보임)
+        string gable = "Roof_Front_Brick" + (spec.cellsX * 2);
+        Add(root.transform, gable, new Vector3(0f, WallHeight, -halfZ), 0f);
+        Add(root.transform, gable, new Vector3(0f, WallHeight, halfZ), 180f);
+
+        ApplyBlueRoof(root);
+
         // 조각에 충돌이 없어서 건물 전체를 막는 상자 하나 (안에는 못 들어감)
         BoxCollider box = root.AddComponent<BoxCollider>();
         box.center = new Vector3(0f, WallHeight * 0.5f, 0f);
@@ -129,6 +135,47 @@ public static class TownBuilder
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
         Object.DestroyImmediate(root);
         return prefab;
+    }
+
+    // 레퍼런스처럼 파란 지붕: 기와 재질(MI_RoundTiles)만 파란 복사본으로 교체
+    const string BlueRoofPath = "Assets/_GrimHollow/Materials/Town/M_Roof_Blue.mat";
+
+    [MenuItem("GrimHollow/Apply Blue Roof To Selection")]
+    static void ApplyBlueRoofToSelection()
+    {
+        foreach (GameObject go in Selection.gameObjects)
+        {
+            ApplyBlueRoof(go);
+        }
+    }
+
+    static void ApplyBlueRoof(GameObject root)
+    {
+        Material blue = AssetDatabase.LoadAssetAtPath<Material>(BlueRoofPath);
+        if (blue == null)
+        {
+            return;
+        }
+
+        foreach (Renderer r in root.GetComponentsInChildren<Renderer>(true))
+        {
+            Material[] mats = r.sharedMaterials;
+            bool changed = false;
+            for (int i = 0; i < mats.Length; i++)
+            {
+                if (mats[i] != null && mats[i].name == "MI_RoundTiles")
+                {
+                    mats[i] = blue;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                Undo.RecordObject(r, "Blue Roof");
+                r.sharedMaterials = mats;
+            }
+        }
     }
 
     static void AddWallOrWindow(Transform parent, Spec spec, bool window, Vector3 pos, float rotY)
