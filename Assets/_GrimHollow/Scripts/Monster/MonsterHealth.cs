@@ -34,6 +34,12 @@ public class MonsterHealth : MonoBehaviour
     public Color telegraphColor = new Color(1f, 0.55f, 0.15f);    // 공격 예고 때 몸 색
     private bool telegraphing;
 
+    // 빈틈: 보스가 기진맥진한 동안 받는 데미지가 늘어남 (Alaloth식 "피하고 → 빈틈에 때리기")
+    public float vulnerableMultiplier = 1.5f;
+    public Color vulnerableColor = new Color(0.55f, 0.75f, 1f);
+    private bool vulnerable;
+    public bool IsVulnerable => vulnerable;
+
     // 생성되는 즉시 준비 (스포너가 만든 그 프레임에 맞아도 에러가 나지 않게)
     void Awake()
     {
@@ -77,6 +83,11 @@ public class MonsterHealth : MonoBehaviour
         if (isDead)
         {
             return;
+        }
+
+        if (vulnerable)
+        {
+            damage = Mathf.RoundToInt(damage * vulnerableMultiplier);
         }
 
         currentHp -= damage;
@@ -130,8 +141,18 @@ public class MonsterHealth : MonoBehaviour
     {
         for (int i = 0; i < renderers.Length; i++)
         {
-            Color normal = telegraphing ? telegraphColor : originalColors[i];
+            Color normal = telegraphing ? telegraphColor : vulnerable ? vulnerableColor : originalColors[i];
             renderers[i].material.color = flash ? Color.red : normal;
+        }
+    }
+
+    // 빈틈 시작/끝 (BossController가 호출): 몸이 푸르게 변하고 데미지가 늘어남
+    public void SetVulnerable(bool on)
+    {
+        vulnerable = on;
+        if (flashTimer <= 0f)
+        {
+            SetColor(false);
         }
     }
 

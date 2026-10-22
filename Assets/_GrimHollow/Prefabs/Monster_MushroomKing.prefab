@@ -194,6 +194,7 @@ GameObject:
   - component: {fileID: 556858996421388246}
   - component: {fileID: 2091784959565586447}
   - component: {fileID: 2251334197661745576}
+  - component: {fileID: 493610801165263511}
   m_Layer: 7
   m_Name: Monster_MushroomKing
   m_TagString: Untagged
@@ -282,7 +283,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2745683929582044312}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e1dd120782524bd3922543bd8266354, type: 3}
   m_Name: 
@@ -328,9 +329,9 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 1
   m_Speed: 3.5
-  m_Acceleration: 20
+  m_Acceleration: 40
   avoidancePriority: 50
-  m_AngularSpeed: 720
+  m_AngularSpeed: 360
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -398,6 +399,8 @@ MonoBehaviour:
   poiseRecovery: 299.7
   staggerImmune: 1
   telegraphColor: {r: 1, g: 0.55, b: 0.15, a: 1}
+  vulnerableMultiplier: 1.5
+  vulnerableColor: {r: 0.55, g: 0.75, b: 1, a: 1}
 --- !u!114 &2251334197661745576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -427,6 +430,56 @@ MonoBehaviour:
     chance: 1
     minCount: 1
     maxCount: 1
+--- !u!114 &493610801165263511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2745683929582044312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 815d888f55d414c8eb5c98008cf39e4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossController
+  bossName: Mushroom King
+  wakeRange: 14
+  walkSpeed: 3.2
+  betweenAttacks: 0.6
+  slamDamage: 30
+  slamRadius: 3.6
+  slamForward: 2.4
+  slamWindUp: 1.1
+  slamRecover: 2.2
+  sweepDamage: 20
+  sweepRadius: 5
+  sweepAngle: 130
+  sweepWindUp: 0.8
+  sweepRecover: 0.9
+  chargeDamage: 30
+  chargeWidth: 2.4
+  chargeLength: 13
+  chargeWindUp: 1
+  chargeSpeed: 15
+  chargeRecover: 2.4
+  chargeWallRecover: 3.4
+  rotateSpeed: 220
+  lockAt: 0.55
+  indicatorOutline: {fileID: 2100000, guid: f251e19b84bf4450a8b6adcce7b2a375, type: 2}
+  indicatorFill: {fileID: 2100000, guid: ec1b249349f6a4b5f83cfbad00c55cc9, type: 2}
+  slamVfx: {fileID: 4420950709411320365, guid: cca321b27b85f487c91543d603062577, type: 3}
+  slamSounds:
+  - {fileID: 8300000, guid: dacda200ad7f2414a934c07a1d46e9b7, type: 3}
+  - {fileID: 8300000, guid: a805591d8d42840b8ad4a70863d40ee7, type: 3}
+  - {fileID: 8300000, guid: bf926e9f5c14e491e9bcdfd8dce20f69, type: 3}
+  - {fileID: 8300000, guid: d804bf9e3923e4b4095dc04541998cf7, type: 3}
+  - {fileID: 8300000, guid: 229ab2d3bd83742b9818f90259277be1, type: 3}
+  swingSounds:
+  - {fileID: 8300000, guid: 67373f26f536342eaa69f3554c3c653d, type: 3}
+  - {fileID: 8300000, guid: 6c5f649d64d3b4e5ba990b63c97e4978, type: 3}
+  - {fileID: 8300000, guid: 3718ffe7280a54d469c554e3b189f0ef, type: 3}
+  - {fileID: 8300000, guid: 58797861e5e6942888a7f5471da02b9c, type: 3}
+  - {fileID: 8300000, guid: f089d28d0e43a49408d1d30db861ac1f, type: 3}
 --- !u!1 &5828789043434048221
 GameObject:
   m_ObjectHideFlags: 0
