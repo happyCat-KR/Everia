@@ -36,9 +36,11 @@ public class PlayerController : MonoBehaviour
     public float attackTurnSpeed = 1440f;   // 공격할 때 마우스 쪽으로 도는 속도 (1440 = 0.125초에 반 바퀴)
     private Quaternion attackRotation;      // 공격할 때 바라볼 방향
 
-    public float dashSpeed = 14f;           // 대시 속도
-    public float dashTime = 0.4f;           // 대시 지속 시간 (이동 + 무적)
-    public float dashCooldown = 0.4f;       // 대시 끝나고 다시 쓰기까지
+    public float dashSpeed = 12f;           // 대시 속도
+    public float dashTime = 0.25f;          // 대시 지속 시간 (이동 + 무적) → 12 × 0.25 = 약 3m
+    public float dashCooldown = 0.15f;      // 대시 끝나고 다시 쓰기까지
+    public int dashStaminaCost = 25;
+    public int attackStaminaCost;           // 공격 1회 스태미나 (PlayerClass가 직업에 맞게 설정)
     private float dashTimer;
     private float dashCooldownTimer;
     private Vector3 dashDirection;
@@ -99,7 +101,7 @@ public class PlayerController : MonoBehaviour
             dashCooldownTimer -= Time.deltaTime;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && !IsDashing && dashCooldownTimer <= 0f)
+        if (Input.GetKeyDown(KeyCode.Space) && !IsDashing && dashCooldownTimer <= 0f && stats.SpendStamina(dashStaminaCost))
         {
             dashDirection = moveDirection != Vector3.zero ? moveDirection : transform.forward;
             transform.rotation = Quaternion.LookRotation(dashDirection);
@@ -173,9 +175,10 @@ public class PlayerController : MonoBehaviour
             comboResetTimer -= Time.deltaTime;
         }
 
-        if (Input.GetMouseButton(0) && !IsAttacking && !InventoryUI.IsOpen && attackCooldownTimer <= 0f && stats.SpendMp(attackManaCost))
+        if (Input.GetMouseButton(0) && !IsAttacking && !InventoryUI.IsOpen && attackCooldownTimer <= 0f && stats.currentStamina >= attackStaminaCost && stats.SpendMp(attackManaCost))
         {
             attackCooldownTimer = attackCooldown;
+            stats.SpendStamina(attackStaminaCost);
 
             // 한참 쉬었다 치면 1타부터
             if (comboResetTimer <= 0f)

@@ -17,6 +17,13 @@ public class PlayerStats : MonoBehaviour
 
     public AudioClip[] hurtSounds;      // 몬스터에게 맞을 때
 
+    // 스태미나: 대시·전사 공격에 사용 (막 구르거나 연타하는 걸 막는 자원)
+    public int maxStamina = 100;
+    public float currentStamina;
+    public float staminaRegen = 20f;        // 초당 회복량
+    public float staminaRegenDelay = 0.6f;  // 쓴 뒤 이만큼 지나야 회복 시작
+    private float staminaRegenTimer;
+
     // 마나: 마법사 공격·스킬에 사용 (연사를 막는 자원)
     public int maxMp = 100;
     public float currentMp;
@@ -26,15 +33,40 @@ public class PlayerStats : MonoBehaviour
     {
         currentHp = maxHp;
         currentMp = maxMp;
+        currentStamina = maxStamina;
         animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
-        if (!isDead)
+        if (isDead)
         {
-            currentMp = Mathf.Min(maxMp, currentMp + mpRegen * Time.deltaTime);
+            return;
         }
+
+        currentMp = Mathf.Min(maxMp, currentMp + mpRegen * Time.deltaTime);
+
+        if (staminaRegenTimer > 0f)
+        {
+            staminaRegenTimer -= Time.deltaTime;
+        }
+        else
+        {
+            currentStamina = Mathf.Min(maxStamina, currentStamina + staminaRegen * Time.deltaTime);
+        }
+    }
+
+    // 스태미나가 충분하면 쓰고 true (쓴 직후엔 잠깐 회복이 멈춤)
+    public bool SpendStamina(int cost)
+    {
+        if (currentStamina < cost)
+        {
+            return false;
+        }
+
+        currentStamina -= cost;
+        staminaRegenTimer = staminaRegenDelay;
+        return true;
     }
 
     // 마나가 충분하면 쓰고 true

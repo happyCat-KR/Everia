@@ -158,9 +158,11 @@ MonoBehaviour:
     m_Bits: 256
   turnSpeed: 720
   attackTurnSpeed: 1440
-  dashSpeed: 14
-  dashTime: 0.4
-  dashCooldown: 0.4
+  dashSpeed: 12
+  dashTime: 0.25
+  dashCooldown: 0.15
+  dashStaminaCost: 25
+  attackStaminaCost: 0
   swingSounds:
   - {fileID: 8300000, guid: db966ed1320d64576a0c73a21c750624, type: 3}
   - {fileID: 8300000, guid: 579e93dd63d7346f89014728c5aa0a2e, type: 3}
@@ -259,6 +261,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: beb09663a64494c25b28bbd687753c56, type: 3}
   - {fileID: 8300000, guid: 2745b28fd87e74525bc06a226639dfc4, type: 3}
   - {fileID: 8300000, guid: f585f187a1e7a402d81a6df28489c25d, type: 3}
+  maxStamina: 100
+  currentStamina: 0
+  staminaRegen: 20
+  staminaRegenDelay: 0.6
   maxMp: 100
   currentMp: 0
   mpRegen: 6
@@ -344,6 +350,7 @@ MonoBehaviour:
     hitDelay: 0.46
     attackCooldown: 0
     attackManaCost: 0
+    attackStaminaCost: 10
     skillManaCost: 0
     skillDamage: 25
     skillRadius: 4
@@ -376,6 +383,7 @@ MonoBehaviour:
     hitDelay: 0.18
     attackCooldown: 0.7
     attackManaCost: 10
+    attackStaminaCost: 0
     skillManaCost: 30
     skillDamage: 30
     skillRadius: 4.5

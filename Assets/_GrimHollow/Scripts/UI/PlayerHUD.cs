@@ -15,6 +15,8 @@ public class PlayerHUD : MonoBehaviour
     public Slider mpBar;
     public TMP_Text mpText;
 
+    public Slider staminaBar;           // 대시·전사 공격에 쓰는 초록 바
+
     public PlayerController playerController;
     public Image skillCooldownFill;     // Q 아이콘 위 어두운 덮개 (쿨타임만큼 남음)
 
@@ -27,6 +29,11 @@ public class PlayerHUD : MonoBehaviour
         levelText.text = $"Lv.{playerStats.level}";
 
         expText.text = $"{playerStats.currentExp} / {playerStats.ExpToNextLevel}";
+
+        if (staminaBar != null)
+        {
+            staminaBar.value = playerStats.currentStamina / playerStats.maxStamina;
+        }
 
         if (mpBar != null)
         {
