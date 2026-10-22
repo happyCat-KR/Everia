@@ -374,6 +374,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2378612682640665242}
     m_Modifications:
+    - target: {fileID: 1276125728790288715, guid: d3135dd5277064a8e868588aaabffd8a, type: 3}
+      propertyPath: minWeight
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1276125728790288715, guid: d3135dd5277064a8e868588aaabffd8a, type: 3}
+      propertyPath: keepBones.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1276125728790288715, guid: d3135dd5277064a8e868588aaabffd8a, type: 3}
+      propertyPath: 'keepBones.Array.data[2]'
+      value: spine_03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1276125728790288715, guid: d3135dd5277064a8e868588aaabffd8a, type: 3}
+      propertyPath: 'keepBones.Array.data[3]'
+      value: clavicle_l
+      objectReference: {fileID: 0}
+    - target: {fileID: 1276125728790288715, guid: d3135dd5277064a8e868588aaabffd8a, type: 3}
+      propertyPath: 'keepBones.Array.data[4]'
+      value: clavicle_r
+      objectReference: {fileID: 0}
     - target: {fileID: 2733003561325679628, guid: d3135dd5277064a8e868588aaabffd8a, type: 3}
       propertyPath: m_Name
       value: Superhero_Male_FullBody
