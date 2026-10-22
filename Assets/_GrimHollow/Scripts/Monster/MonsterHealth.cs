@@ -66,14 +66,17 @@ public class MonsterHealth : MonoBehaviour
         currentHp -= damage;
         Sfx.Play(hitSounds, 0.9f);
 
+        // 몬스터마다 키가 달라서 충돌체 크기 기준으로 위치를 잡음
+        Bounds body = GetComponent<Collider>().bounds;
+
         if (hitVfx != null)
         {
-            GameObject vfx = Instantiate(hitVfx, transform.position + Vector3.up * 0.9f, Quaternion.identity);
+            GameObject vfx = Instantiate(hitVfx, body.center, Quaternion.identity);
             Destroy(vfx, 2f);
         }
 
         // 데미지 숫자 (살짝 랜덤 위치로 겹침 방지)
-        Vector3 popupPos = transform.position + Vector3.up * 2.7f + Random.insideUnitSphere * 0.3f;
+        Vector3 popupPos = new Vector3(transform.position.x, body.max.y + 0.6f, transform.position.z) + Random.insideUnitSphere * 0.3f;
         DamagePopup popup = Instantiate(damagePopupPrefab, popupPos, Quaternion.identity);
         popup.Setup(damage);
 
