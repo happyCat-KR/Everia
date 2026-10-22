@@ -19,7 +19,8 @@ public class RootMotionRelay : MonoBehaviour
     // 애니메이터가 이번 프레임에 움직인 양을 받아서 처리
     void OnAnimatorMove()
     {
-        if (!player.IsAttacking || MonsterInFront())
+        // 시작 화면 미리보기처럼 조작이 꺼진 캐릭터는 제자리
+        if (player == null || !player.enabled || !player.IsAttacking || MonsterInFront())
         {
             return;
         }
