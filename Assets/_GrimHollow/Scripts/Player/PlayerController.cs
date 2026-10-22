@@ -1,0 +1,252 @@
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    public float moveSpeed = 5f;        // 앞으로 갈 때 (뛰기)
+    public float gravity = -9.81f;
+
+    private CharacterController controller;
+    private Animator animator;
+    private Camera mainCamera;
+    private float verticalVelocity;
+
+    public float nextAttackPoint = 0.9f;    // 동작이 몇 % 진행되면 다음 공격 가능 (0.9 = 90%)
+    private float attackTimer;
+
+    public int attackDamage = 10;
+    public float attackRange = 2f;     // 판정 반경
+    public float attackAngle = 120f;   // 부채꼴 각도
+    public float hitDelay = 0.3f;      // 클릭 후 데미지가 들어가는 시점 (검 휘두르는 순간)
+    public LayerMask monsterLayer;
+
+    private float hitTimer;
+
+    private int comboStep;                  // 다음에 나갈 타 (0 = 1타, 1 = 2타, 2 = 3타)
+    public float comboResetTime = 0.5f;     // 공격이 끝나고 이 시간 안에 안 누르면 1타부터
+
+    public float attackBlendTime = 0.15f;   // 지금 자세 -> 공격 시작 자세로 섞이는 시간
+    private float comboResetTimer;
+
+    public LayerMask obstacleLayer;     // 공격을 막는 벽
+
+    public bool IsAttacking => !IsDashing && (attackTimer > 0f || IsAttackAnimPlaying());    // 공격 모션 중인지
+
+    public float turnSpeed = 720f;     // 초당 회전 각도 (720 = 0.25초에 반 바퀴)
+
+    public float attackTurnSpeed = 1440f;   // 공격할 때 마우스 쪽으로 도는 속도 (1440 = 0.125초에 반 바퀴)
+    private Quaternion attackRotation;      // 공격할 때 바라볼 방향
+
+    public float dashSpeed = 14f;           // 대시 속도
+    public float dashTime = 0.4f;           // 대시 지속 시간 (이동 + 무적)
+    public float dashCooldown = 0.4f;       // 대시 끝나고 다시 쓰기까지
+    private float dashTimer;
+    private float dashCooldownTimer;
+    private Vector3 dashDirection;
+
+    public bool IsDashing => dashTimer > 0f;    // 대시 중 = 무적
+
+    void Start()
+    {
+        controller = GetComponent<CharacterController>();
+        animator = GetComponentInChildren<Animator>();
+        mainCamera = Camera.main;
+    }
+
+    void Update()
+    {
+        // 1. 이동 입력: WASD (월드 방향 기준)
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        float vertical = Input.GetAxisRaw("Vertical");
+        Vector3 moveDirection = new Vector3(horizontal, 0f, vertical).normalized;
+
+        // 대시: Space → 이동 방향(없으면 바라보는 방향)으로 빠르게. 공격 중이어도 끊고 나감
+        if (dashCooldownTimer > 0f)
+        {
+            dashCooldownTimer -= Time.deltaTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && !IsDashing && dashCooldownTimer <= 0f)
+        {
+            dashDirection = moveDirection != Vector3.zero ? moveDirection : transform.forward;
+            transform.rotation = Quaternion.LookRotation(dashDirection);
+            animator.CrossFadeInFixedTime("Dash", 0.05f, 1, 0f);
+
+            dashTimer = dashTime;
+            dashCooldownTimer = dashTime + dashCooldown;
+            attackTimer = 0f;       // 공격 취소
+            hitTimer = 0f;          // 예약된 데미지 취소
+            comboStep = 0;          // 다음 공격은 1타부터
+        }
+
+        if (IsDashing)
+        {
+            dashTimer -= Time.deltaTime;
+
+            Vector3 dashVelocity = dashDirection * dashSpeed;
+            dashVelocity.y = verticalVelocity;      // 땅에 붙어 있게
+            controller.Move(dashVelocity * Time.deltaTime);
+            return;     // 대시 중에는 공격·이동·회전 처리 안 함
+        }
+
+        // 2. 공격: 좌클릭 → 그 순간 마우스 쪽으로 돌아서 휘두름
+        if (attackTimer > 0f)
+        {
+            attackTimer -= Time.deltaTime;
+        }
+
+        // 공격 중엔 콤보 유지, 끝나면 대기 시간 감소
+        if (IsAttacking)
+        {
+            comboResetTimer = comboResetTime;
+        }
+        else if (comboResetTimer > 0f)
+        {
+            comboResetTimer -= Time.deltaTime;
+        }
+
+        if (Input.GetMouseButton(0) && !IsAttacking)
+        {
+            // 한참 쉬었다 치면 1타부터
+            if (comboResetTimer <= 0f)
+            {
+                comboStep = 0;
+            }
+
+            attackRotation = transform.rotation;    // 마우스 방향을 못 구하면 지금 방향 유지
+
+            FaceMouse();
+            animator.CrossFadeInFixedTime("Attack" + (comboStep + 1), attackBlendTime, 1, 0f);   // 지금 자세에서 부드럽게 넘어감
+            comboStep = (comboStep + 1) % 2;    // 0 → 1 → 0 (1타 → 2타 반복)
+
+            attackTimer = attackBlendTime + 0.05f;     // 애니메이터가 공격 상태로 넘어갈 때까지 잠깐 잠금
+            hitTimer = hitDelay;
+        }
+
+        // 공격 중에는 제자리에 멈춤
+        if (IsAttacking)
+        {
+            moveDirection = Vector3.zero;
+        }
+
+        // 3. 회전: 평소엔 이동 방향, 공격 중엔 마우스 방향으로 빠르게 돌기
+        if (IsAttacking)
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, attackRotation, attackTurnSpeed * Time.deltaTime);
+        }
+        else if (moveDirection != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+        }
+
+        // 휘두르는 타이밍에 데미지
+        if (hitTimer > 0f)
+        {
+            hitTimer -= Time.deltaTime;
+            if (hitTimer <= 0f)
+            {
+                DealDamage();
+            }
+        }
+
+        // 4. 캐릭터 기준 방향으로 변환 → 애니메이션
+        Vector3 localMove = transform.InverseTransformDirection(moveDirection);
+        animator.SetFloat("MoveX", localMove.x, 0.1f, Time.deltaTime);
+        animator.SetFloat("MoveZ", localMove.z, 0.1f, Time.deltaTime);
+
+        // 5. 중력
+        if (controller.isGrounded && verticalVelocity < 0f)
+        {
+            verticalVelocity = -2f;
+        }
+        verticalVelocity += gravity * Time.deltaTime;
+
+        Vector3 velocity = moveDirection * moveSpeed;
+        velocity.y = verticalVelocity;
+        controller.Move(velocity * Time.deltaTime);
+    }
+
+    // UpperBody 레이어에서 공격 동작이 아직 재생 중인지
+    bool IsAttackAnimPlaying()
+    {
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(1);
+        bool inAttack = state.IsName("Attack1") || state.IsName("Attack2") || state.IsName("Attack3");
+        return inAttack && state.normalizedTime < nextAttackPoint;
+    }
+
+    void FaceMouse()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, transform.position);
+
+        if (groundPlane.Raycast(ray, out float enter))
+        {
+            Vector3 lookDirection = ray.GetPoint(enter) - transform.position;
+            lookDirection.y = 0f;
+
+            if (lookDirection.sqrMagnitude > 0.01f)
+            {
+                attackRotation = Quaternion.LookRotation(lookDirection);   // 바로 돌지 않고 목표만 정함
+            }
+        }
+    }
+
+    void DealDamage()
+    {
+        Vector3 center = transform.position + Vector3.up;   // 몸 중심 높이
+        Collider[] hits = Physics.OverlapSphere(center, attackRange, monsterLayer);
+
+        MonsterHealth target = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (Collider hit in hits)
+        {
+            MonsterHealth monster = hit.GetComponent<MonsterHealth>();
+            if (monster == null || monster.isDead)
+            {
+                continue;
+            }
+
+            Vector3 toMonster = hit.transform.position - transform.position;
+            toMonster.y = 0f;
+
+            // 부채꼴 밖이면 제외
+            if (Vector3.Angle(transform.forward, toMonster) > attackAngle * 0.5f)
+            {
+                continue;
+            }
+
+            // 사이에 벽이 있으면 제외  ← 여기 추가
+            if (Physics.Linecast(center, hit.bounds.center, obstacleLayer))
+            {
+                continue;
+            }
+
+            // 가장 가까운 한 마리
+            float distance = toMonster.magnitude;
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                target = monster;
+            }
+        }
+
+        if (target != null)
+        {
+            target.TakeDamage(attackDamage);
+        }
+    }
+
+    // Scene 뷰에서 Player 선택 시 판정 범위 표시
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Vector3 center = transform.position + Vector3.up;
+        Gizmos.DrawWireSphere(center, attackRange);
+
+        Vector3 left = Quaternion.Euler(0f, -attackAngle * 0.5f, 0f) * transform.forward;
+        Vector3 right = Quaternion.Euler(0f, attackAngle * 0.5f, 0f) * transform.forward;
+        Gizmos.DrawLine(center, center + left * attackRange);
+        Gizmos.DrawLine(center, center + right * attackRange);
+    }
+}
