@@ -316,7 +316,7 @@ MonoBehaviour:
   dashTime: 0.25
   dashCooldown: 0.15
   dashStaminaCost: 25
-  dashStyle: 0
+  dashStyle: 1
   dashEffects: {fileID: 0}
   attackStaminaCost: 0
   swingSounds:
