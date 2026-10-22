@@ -28,7 +28,8 @@ public class MonsterController : MonoBehaviour
     private float stunTimer;
     private Vector3 knockback;
 
-    void Start()
+    // 생성되는 즉시 준비 (스포너가 만든 그 프레임에 맞아도 에러가 나지 않게)
+    void Awake()
     {
         target = GameObject.FindWithTag("Player").transform;
 

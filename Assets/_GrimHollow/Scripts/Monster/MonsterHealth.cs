@@ -25,7 +25,8 @@ public class MonsterHealth : MonoBehaviour
     public AudioClip[] deathSounds;     // 죽을 때
     public GameObject hitVfx;           // 맞을 때 불꽃
 
-    void Start()
+    // 생성되는 즉시 준비 (스포너가 만든 그 프레임에 맞아도 에러가 나지 않게)
+    void Awake()
     {
         currentHp = maxHp;
         animator = GetComponentInChildren<Animator>();
@@ -38,10 +39,13 @@ public class MonsterHealth : MonoBehaviour
             originalColors[i] = renderers[i].material.color;
         }
 
+        playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
+    }
+
+    void Start()
+    {
         hpBar.value = 1f;
         hpBar.gameObject.SetActive(false);  // 맞기 전엔 숨김
-
-        playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
     }
 
     void Update()
