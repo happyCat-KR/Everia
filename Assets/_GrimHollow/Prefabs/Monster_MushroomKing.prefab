@@ -375,7 +375,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ec6eafd421d84f42bf10ea368cdd854, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterHealth
-  maxHp: 500
+  maxHp: 400
   currentHp: 0
   isDead: 0
   destroyDelay: 3
