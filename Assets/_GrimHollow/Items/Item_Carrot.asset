@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad2f7f5a670714ecca16f7e969087338, type: 3}
+  m_Name: Item_Carrot
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  displayName: Carrot
+  icon: {fileID: 4194206188003602812, guid: 102be7b22a07c4996881db67002d2e83, type: 3}
+  type: 0
+  worldModel: {fileID: 6425735572476389642, guid: d91df7744b9ea4dbcbf8b5b04cac7be4, type: 3}
+  healAmount: 20
+  slot: 0
+  usableBy: 0
+  attackBonus: 0
+  equipModel: {fileID: 0}
+  goldAmount: 1

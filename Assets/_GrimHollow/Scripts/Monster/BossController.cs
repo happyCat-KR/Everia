@@ -13,6 +13,7 @@ public class BossController : MonoBehaviour
     public float wakeRange = 14f;           // 이 안에 들어오면 깨어남
     public float walkSpeed = 3.2f;
     public float betweenAttacks = 0.4f;     // 패턴 사이에 숨 돌리는 시간
+    public bool autoWake = true;            // false면 Wake()를 불러 줄 때까지 대기 (던전 등장 연출용)
 
     [Header("Slam (내려찍기)")]
     public int slamDamage = 34;
@@ -176,11 +177,21 @@ public class BossController : MonoBehaviour
     {
         animator.SetFloat("Speed", 0f, 0.1f, Time.deltaTime);
         // 가까이 오거나 맞으면 깨어남
-        if (FlatDistance(target.position) <= wakeRange || health.currentHp < health.maxHp)
+        if (autoWake && (FlatDistance(target.position) <= wakeRange || health.currentHp < health.maxHp))
         {
-            state = State.Chase;
-            decisionTimer = 0.8f;
+            Wake();
         }
+    }
+
+    public void Wake()
+    {
+        if (state != State.Idle)
+        {
+            return;
+        }
+
+        state = State.Chase;
+        decisionTimer = 0.8f;
     }
 
     void UpdateChase()

@@ -303,10 +303,10 @@ MonoBehaviour:
   maxSlots: 8
   slots: []
   gold: 0
-  quickPotion: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
+  quickPotion: {fileID: 11400000, guid: 1d8e4e97f1dc342c9a486fbc2ec65651, type: 2}
   startingItems:
-  - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
-    count: 3
+  - item: {fileID: 11400000, guid: 1d8e4e97f1dc342c9a486fbc2ec65651, type: 2}
+    count: 2
   warriorStartWeapon: {fileID: 11400000, guid: f1e6868b3e91146cf9355a900514d134, type: 2}
   mageStartWeapon: {fileID: 11400000, guid: 75b859636c8e54427b46d457199d7cc9, type: 2}
   weaponSocket: {fileID: 7558327474713702454}
@@ -316,6 +316,7 @@ MonoBehaviour:
   drinkSounds:
   - {fileID: 8300000, guid: b08716e68042e45ab8626907da853717, type: 3}
   - {fileID: 8300000, guid: 7632eaed5506c4bdc8c794de08a7d3c3, type: 3}
+  consumeCooldown: 3
 --- !u!114 &4064950795533928274
 MonoBehaviour:
   m_ObjectHideFlags: 0

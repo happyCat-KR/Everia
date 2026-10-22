@@ -6,6 +6,8 @@ public class ScenePortal : MonoBehaviour
 {
     public string targetScene;      // 이동할 씬 이름 (Build Settings에 등록돼 있어야 함)
     public string targetSpawn;      // 도착 씬의 SpawnPoint id
+    public string locationTitle;    // 도착해서 보여 줄 장소 이름 (예: 던전 1층)
+    public string locationSubtitle;
 
     // 씬이 바뀌어도 남아야 하는 값 (도착 위치, 플레이어 상태)
     public static string nextSpawn;
@@ -33,6 +35,6 @@ public class ScenePortal : MonoBehaviour
         Inventory.SaveForSceneChange(other.GetComponent<Inventory>());
 
         nextSpawn = targetSpawn;
-        SceneManager.LoadScene(targetScene);
+        SceneFader.GoTo(targetScene, locationTitle, locationSubtitle);
     }
 }

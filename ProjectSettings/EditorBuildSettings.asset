@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/_GrimHollow/Scenes/Town.unity
     guid: c84c92e21b13c4af19af85bac3518fe7
   - enabled: 1
+    path: Assets/_GrimHollow/Scenes/Dungeon.unity
+    guid: 5e1b7969f43a2431283fd790753a93ef
+  - enabled: 0
     path: Assets/_GrimHollow/Scenes/Field_Forest.unity
     guid: 70b9bcc504fe84ee98c173afc479318a
   - enabled: 0

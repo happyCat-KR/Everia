@@ -52,6 +52,6 @@ public class TitleMenu : MonoBehaviour
         ScenePortal.nextSpawn = null;
         ScenePortal.hasSavedStats = false;
         Inventory.ClearSaved();
-        SceneManager.LoadScene(firstScene);
+        SceneFader.GoTo(firstScene, "마을", "Everia");
     }
 }

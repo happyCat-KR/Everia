@@ -27,8 +27,12 @@ public class GameOverUI : MonoBehaviour
     }
 
     // 버튼에서 호출
+    // 죽으면 마을에서 처음부터 (레벨·가방도 초기화: 던전을 한 번에 못 깨는 도전 구조)
     public void Restart()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        ScenePortal.nextSpawn = null;
+        ScenePortal.hasSavedStats = false;
+        Inventory.ClearSaved();
+        SceneFader.GoTo("Town", "마을", "다시 도전");
     }
 }

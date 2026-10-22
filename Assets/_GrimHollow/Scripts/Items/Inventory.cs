@@ -72,8 +72,16 @@ public class Inventory : MonoBehaviour
         Changed?.Invoke();
     }
 
+    public float consumeCooldown = 3f;      // 회복 아이템을 다시 먹을 수 있기까지
+    private float consumeCooldownTimer;
+
     void Update()
     {
+        if (consumeCooldownTimer > 0f)
+        {
+            consumeCooldownTimer -= Time.deltaTime;
+        }
+
         if (Input.GetKeyDown(KeyCode.Alpha1) && quickPotion != null)
         {
             Use(quickPotion);
@@ -143,11 +151,12 @@ public class Inventory : MonoBehaviour
 
         if (item.type == ItemType.Consumable)
         {
-            if (stats.currentHp >= stats.maxHp)
+            if (stats.currentHp >= stats.maxHp || consumeCooldownTimer > 0f)
             {
-                return;     // 체력이 가득이면 아깝게 쓰지 않음
+                return;     // 체력이 가득이거나 방금 먹었으면 못 먹음 (연타로 버티기 방지)
             }
 
+            consumeCooldownTimer = consumeCooldown;
             stats.Heal(item.healAmount);
             Sfx.Play(drinkSounds, 0.8f);
             RemoveFromBag(item, 1);

@@ -20,13 +20,25 @@ public class BossHealthBar : MonoBehaviour
 
     void Start()
     {
-        nameText.text = boss.bossName.ToUpper();
         group.alpha = 0f;
+        if (boss != null)
+        {
+            nameText.text = boss.bossName.ToUpper();
+        }
+    }
+
+    // 던전처럼 보스가 나중에 생기는 경우 연결
+    public void Bind(BossController newBoss, MonsterHealth newHealth)
+    {
+        boss = newBoss;
+        health = newHealth;
+        deadTimer = 0f;
+        nameText.text = boss.bossName.ToUpper();
     }
 
     void Update()
     {
-        if (boss == null)
+        if (boss == null || health == null)
         {
             group.alpha = 0f;
             return;

@@ -558,6 +558,9 @@ MonoBehaviour:
   poiseRecovery: 3.6000001
   staggerImmune: 0
   telegraphColor: {r: 1, g: 0.55, b: 0.15, a: 1}
+  vulnerableMultiplier: 1.5
+  vulnerableColor: {r: 0.55, g: 0.75, b: 1, a: 1}
+  invulnerable: 0
 --- !u!114 &1479262919843146165
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -575,8 +578,8 @@ MonoBehaviour:
     chance: 0.8
     minCount: 2
     maxCount: 5
-  - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
-    chance: 0.2
+  - item: {fileID: 11400000, guid: 1d8e4e97f1dc342c9a486fbc2ec65651, type: 2}
+    chance: 0.08
     minCount: 1
     maxCount: 1
 --- !u!1 &4011352095441457306

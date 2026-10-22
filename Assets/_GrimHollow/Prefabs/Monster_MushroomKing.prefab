@@ -135,7 +135,7 @@ RectTransform:
   m_Father: {fileID: 7661049535155085241}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -419,10 +419,6 @@ MonoBehaviour:
     chance: 1
     minCount: 1
     maxCount: 1
-  - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
-    chance: 1
-    minCount: 2
-    maxCount: 2
   - item: {fileID: 11400000, guid: 761c21f265be14b91868ff8876fc5c3d, type: 2}
     chance: 1
     minCount: 60
@@ -447,6 +443,7 @@ MonoBehaviour:
   wakeRange: 14
   walkSpeed: 3.2
   betweenAttacks: 0.4
+  autoWake: 1
   slamDamage: 34
   slamRadius: 3.6
   slamForward: 2.4
@@ -524,7 +521,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1526564327099203992
 RectTransform:
   m_ObjectHideFlags: 0
