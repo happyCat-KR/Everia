@@ -401,6 +401,7 @@ MonoBehaviour:
   telegraphColor: {r: 1, g: 0.55, b: 0.15, a: 1}
   vulnerableMultiplier: 1.5
   vulnerableColor: {r: 0.55, g: 0.75, b: 1, a: 1}
+  invulnerable: 0
 --- !u!114 &2251334197661745576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -445,29 +446,49 @@ MonoBehaviour:
   bossName: Mushroom King
   wakeRange: 14
   walkSpeed: 3.2
-  betweenAttacks: 0.6
-  slamDamage: 30
+  betweenAttacks: 0.4
+  slamDamage: 34
   slamRadius: 3.6
   slamForward: 2.4
-  slamWindUp: 1.1
-  slamRecover: 2.2
-  sweepDamage: 20
+  slamWindUp: 0.9
+  slamRecover: 1.8
+  sweepDamage: 24
   sweepRadius: 5
   sweepAngle: 130
-  sweepWindUp: 0.8
-  sweepRecover: 0.9
-  chargeDamage: 30
+  sweepWindUp: 0.65
+  sweepRecover: 0.8
+  chargeDamage: 34
   chargeWidth: 2.4
   chargeLength: 13
-  chargeWindUp: 1
+  chargeWindUp: 0.85
   chargeSpeed: 15
-  chargeRecover: 2.4
-  chargeWallRecover: 3.4
+  chargeRecover: 2
+  chargeWallRecover: 3.2
+  phase2Threshold: 0.5
+  timeScale2: 0.8
+  moveBoost2: 1.25
+  roarTime: 2.2
+  shockwaveRadius: 8
+  shockwavePush: 14
+  shockwaveDamage: 10
+  growScale: 1.15
+  rageTint: {r: 0.9, g: 0.1, b: 0.05, a: 1}
+  comboSlams: 3
+  comboWindUp: 0.65
+  comboStepSpeed: 4.5
+  sporeCount: 6
+  sporeRadius: 2.3
+  sporeInterval: 0.4
+  sporeFill: 1
+  sporeDamage: 24
+  sporeJitter: 2.5
   rotateSpeed: 220
   lockAt: 0.55
   indicatorOutline: {fileID: 2100000, guid: f251e19b84bf4450a8b6adcce7b2a375, type: 2}
   indicatorFill: {fileID: 2100000, guid: ec1b249349f6a4b5f83cfbad00c55cc9, type: 2}
   slamVfx: {fileID: 4420950709411320365, guid: cca321b27b85f487c91543d603062577, type: 3}
+  sporeVfx: {fileID: 3273446378772247870, guid: 05178602c0f8a48fc8877b5f1cd8143e, type: 3}
+  shockwaveVfx: {fileID: 3275608922800242535, guid: 648794a8dc0744049933111b98256a83, type: 3}
   slamSounds:
   - {fileID: 8300000, guid: dacda200ad7f2414a934c07a1d46e9b7, type: 3}
   - {fileID: 8300000, guid: a805591d8d42840b8ad4a70863d40ee7, type: 3}
@@ -480,6 +501,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3718ffe7280a54d469c554e3b189f0ef, type: 3}
   - {fileID: 8300000, guid: 58797861e5e6942888a7f5471da02b9c, type: 3}
   - {fileID: 8300000, guid: f089d28d0e43a49408d1d30db861ac1f, type: 3}
+  roarSounds:
+  - {fileID: 8300000, guid: 715799e8d59da4b07b0996cf3e09ac98, type: 3}
+  - {fileID: 8300000, guid: c5ae1f984df20448fa5cd45245227943, type: 3}
+  - {fileID: 8300000, guid: f0486409a573a460d901aaca036c7e56, type: 3}
+  - {fileID: 8300000, guid: 365d4a8acbbe04444b1c8607de4570dc, type: 3}
+  - {fileID: 8300000, guid: 34fbbd7d8320142c0a06a3dcbe854bdd, type: 3}
 --- !u!1 &5828789043434048221
 GameObject:
   m_ObjectHideFlags: 0

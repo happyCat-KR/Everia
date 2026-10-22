@@ -51,6 +51,15 @@ public class PlayerController : MonoBehaviour
 
     public bool IsDashing => dashTimer > 0f;    // 대시 중 = 무적
 
+    // 밀쳐내기 (보스 포효 충격파 등): 속도가 점점 줄어들며 밀려남
+    private Vector3 pushVelocity;
+
+    public void Push(Vector3 velocity)
+    {
+        velocity.y = 0f;
+        pushVelocity = velocity;
+    }
+
     public AudioClip[] swingSounds;         // 칼 휘두르기
     public AudioClip[] dashSounds;          // 대시
     public AudioClip[] footstepSounds;      // 발소리
@@ -99,6 +108,13 @@ public class PlayerController : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
         Quaternion cameraYaw = Quaternion.Euler(0f, mainCamera.transform.eulerAngles.y, 0f);
         Vector3 moveDirection = cameraYaw * new Vector3(horizontal, 0f, vertical).normalized;
+
+        // 밀려나는 중 (보스 충격파 등)
+        if (pushVelocity.sqrMagnitude > 0.05f)
+        {
+            controller.Move(pushVelocity * Time.deltaTime);
+            pushVelocity = Vector3.Lerp(pushVelocity, Vector3.zero, 7f * Time.deltaTime);
+        }
 
         // 대시: Space → 이동 방향(없으면 바라보는 방향)으로 빠르게. 공격 중이어도 끊고 나감
         if (dashCooldownTimer > 0f)

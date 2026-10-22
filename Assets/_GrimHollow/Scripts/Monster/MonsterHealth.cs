@@ -40,6 +40,18 @@ public class MonsterHealth : MonoBehaviour
     private bool vulnerable;
     public bool IsVulnerable => vulnerable;
 
+    public bool invulnerable;           // 포효 연출 중에는 데미지를 안 받음
+
+    // 2페이즈 격노: 몸 색을 붉게 (원래 색에 섞음)
+    public void EnterRage(Color tint, float amount)
+    {
+        for (int i = 0; i < originalColors.Length; i++)
+        {
+            originalColors[i] = Color.Lerp(originalColors[i], tint, amount);
+        }
+        SetColor(false);
+    }
+
     // 생성되는 즉시 준비 (스포너가 만든 그 프레임에 맞아도 에러가 나지 않게)
     void Awake()
     {
@@ -80,7 +92,7 @@ public class MonsterHealth : MonoBehaviour
     // heavy: 스킬처럼 강한 공격 (게이지와 상관없이 경직 + 넉백)
     public void TakeDamage(int damage, bool heavy = false)
     {
-        if (isDead)
+        if (isDead || invulnerable)
         {
             return;
         }
