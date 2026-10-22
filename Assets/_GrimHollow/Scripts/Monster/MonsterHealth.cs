@@ -23,6 +23,7 @@ public class MonsterHealth : MonoBehaviour
 
     public AudioClip[] hitSounds;       // 맞을 때
     public AudioClip[] deathSounds;     // 죽을 때
+    public GameObject hitVfx;           // 맞을 때 불꽃
 
     void Start()
     {
@@ -64,6 +65,12 @@ public class MonsterHealth : MonoBehaviour
 
         currentHp -= damage;
         Sfx.Play(hitSounds, 0.9f);
+
+        if (hitVfx != null)
+        {
+            GameObject vfx = Instantiate(hitVfx, transform.position + Vector3.up * 0.9f, Quaternion.identity);
+            Destroy(vfx, 2f);
+        }
 
         // 데미지 숫자 (살짝 랜덤 위치로 겹침 방지)
         Vector3 popupPos = transform.position + Vector3.up * 2.7f + Random.insideUnitSphere * 0.3f;

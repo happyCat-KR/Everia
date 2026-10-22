@@ -152,6 +152,23 @@ MonoBehaviour:
   - {fileID: 8300000, guid: bc5c5d2a39ee640e49654482351249d4, type: 3}
   - {fileID: 8300000, guid: 33d25ae10f0c64ab3a8fe2de5a2aa2d7, type: 3}
   footstepInterval: 0.32
+  skillDamage: 25
+  skillRadius: 4
+  skillCooldown: 5
+  skillHitDelay: 0.2
+  skillVfx: {fileID: 1859499208117265980, guid: 3469df188a3304e39893918ee3211484, type: 3}
+  skillDustVfx: {fileID: 4420950709411320365, guid: cca321b27b85f487c91543d603062577, type: 3}
+  skillSounds:
+  - {fileID: 8300000, guid: 948c55ac215ae4ef68d16ebb74becf22, type: 3}
+  - {fileID: 8300000, guid: 317af7d678d4647baab0a28d49c17942, type: 3}
+  - {fileID: 8300000, guid: 6385f5dddb23c4fbca0b8c06ab4a755f, type: 3}
+  - {fileID: 8300000, guid: e7c82e1ccdfae417786c09cb5f79b040, type: 3}
+  - {fileID: 8300000, guid: cdc40d068c9994940b6de367b0e898f8, type: 3}
+  - {fileID: 8300000, guid: 8954281ccfc4343d9a9278ffc253712b, type: 3}
+  - {fileID: 8300000, guid: 8e5a195b74c054549b5206826b48ab88, type: 3}
+  - {fileID: 8300000, guid: 9ba53058ff8ba4531a51570a4233ff26, type: 3}
+  - {fileID: 8300000, guid: fc3a80a3cd5194205ac8cf628792160f, type: 3}
+  - {fileID: 8300000, guid: 59ad8ed39844745a3bc9235fc0b76187, type: 3}
 --- !u!143 &575183985764100725
 CharacterController:
   m_ObjectHideFlags: 0

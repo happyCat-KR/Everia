@@ -12,6 +12,9 @@ public class PlayerHUD : MonoBehaviour
     public TMP_Text levelText;
     public TMP_Text expText;
 
+    public PlayerController playerController;
+    public Image skillCooldownFill;     // Q 아이콘 위 어두운 덮개 (쿨타임만큼 남음)
+
     void Update()
     {
         hpBar.value = (float)playerStats.currentHp / playerStats.maxHp;
@@ -21,5 +24,10 @@ public class PlayerHUD : MonoBehaviour
         levelText.text = $"Lv.{playerStats.level}";
 
         expText.text = $"{playerStats.currentExp} / {playerStats.ExpToNextLevel}";
+
+        if (skillCooldownFill != null)
+        {
+            skillCooldownFill.fillAmount = Mathf.Clamp01(playerController.SkillCooldownRatio);
+        }
     }
 }

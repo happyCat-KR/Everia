@@ -51,6 +51,19 @@ public class PlayerController : MonoBehaviour
     public float footstepInterval = 0.32f;  // 발소리 간격 (달리기 속도에 맞춤)
     private float footstepTimer;
 
+    // Q 스킬: 주변 광역 베기
+    public int skillDamage = 25;
+    public float skillRadius = 4f;
+    public float skillCooldown = 5f;
+    public float skillHitDelay = 0.2f;      // 휘두르는 순간에 데미지
+    public GameObject skillVfx;             // 바닥 원형 베기 이펙트
+    public GameObject skillDustVfx;         // 흙먼지
+    public AudioClip[] skillSounds;
+    private float skillCooldownTimer;
+    private float skillHitTimer;
+
+    public float SkillCooldownRatio => skillCooldownTimer / skillCooldown;    // HUD용 (1 = 방금 씀, 0 = 사용 가능)
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -100,6 +113,35 @@ public class PlayerController : MonoBehaviour
         if (attackTimer > 0f)
         {
             attackTimer -= Time.deltaTime;
+        }
+
+        // Q 스킬: 쿨타임이 끝났으면 일반 공격을 끊고 주변 전체를 벰
+        if (skillCooldownTimer > 0f)
+        {
+            skillCooldownTimer -= Time.deltaTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q) && skillCooldownTimer <= 0f)
+        {
+            attackRotation = transform.rotation;
+            FaceMouse();
+            animator.CrossFadeInFixedTime("Attack2", 0.05f, 1, 0f);
+            Sfx.Play(skillSounds, 0.9f);
+
+            skillCooldownTimer = skillCooldown;
+            skillHitTimer = skillHitDelay;
+            attackTimer = attackBlendTime + 0.05f;
+            hitTimer = 0f;          // 일반 공격 데미지 예약 취소
+            comboStep = 0;
+        }
+
+        if (skillHitTimer > 0f)
+        {
+            skillHitTimer -= Time.deltaTime;
+            if (skillHitTimer <= 0f)
+            {
+                CastSkill();
+            }
         }
 
         // 공격 중엔 콤보 유지, 끝나면 대기 시간 감소
@@ -258,7 +300,38 @@ public class PlayerController : MonoBehaviour
         if (target != null)
         {
             target.TakeDamage(attackDamage);
+            CameraFollow.Shake(0.12f, 0.12f);
         }
+    }
+
+    // 주변 모든 몬스터에게 데미지 (넉백은 MonsterHealth가 처리)
+    void CastSkill()
+    {
+        Vector3 feet = transform.position + Vector3.up * 0.05f;
+        SpawnVfx(skillVfx, feet);
+        SpawnVfx(skillDustVfx, feet);
+        CameraFollow.Shake(0.3f, 0.25f);
+
+        Collider[] hits = Physics.OverlapSphere(transform.position + Vector3.up, skillRadius, monsterLayer);
+        foreach (Collider hit in hits)
+        {
+            MonsterHealth monster = hit.GetComponent<MonsterHealth>();
+            if (monster != null && !monster.isDead)
+            {
+                monster.TakeDamage(skillDamage);
+            }
+        }
+    }
+
+    void SpawnVfx(GameObject prefab, Vector3 position)
+    {
+        if (prefab == null)
+        {
+            return;
+        }
+
+        GameObject vfx = Instantiate(prefab, position, Quaternion.identity);
+        Destroy(vfx, 3f);
     }
 
     // Scene 뷰에서 Player 선택 시 판정 범위 표시
@@ -272,5 +345,8 @@ public class PlayerController : MonoBehaviour
         Vector3 right = Quaternion.Euler(0f, attackAngle * 0.5f, 0f) * transform.forward;
         Gizmos.DrawLine(center, center + left * attackRange);
         Gizmos.DrawLine(center, center + right * attackRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(center, skillRadius);
     }
 }
