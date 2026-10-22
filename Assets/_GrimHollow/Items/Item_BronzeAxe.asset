@@ -17,6 +17,8 @@ MonoBehaviour:
   type: 1
   worldModel: {fileID: 8622936645134191970, guid: 612af989ccafd48c59255ad29f226968, type: 3}
   healAmount: 0
+  slot: 1
+  usableBy: 1
   attackBonus: 8
   equipModel: {fileID: 8622936645134191970, guid: 612af989ccafd48c59255ad29f226968, type: 3}
   goldAmount: 1

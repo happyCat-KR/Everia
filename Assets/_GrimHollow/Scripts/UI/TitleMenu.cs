@@ -51,6 +51,7 @@ public class TitleMenu : MonoBehaviour
         // 새 게임: 이전 판의 씬 이동 정보는 지움
         ScenePortal.nextSpawn = null;
         ScenePortal.hasSavedStats = false;
+        Inventory.ClearSaved();
         SceneManager.LoadScene(firstScene);
     }
 }

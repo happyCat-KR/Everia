@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad2f7f5a670714ecca16f7e969087338, type: 3}
+  m_Name: Item_SkullStaff
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  displayName: Skull Staff
+  icon: {fileID: -5212204027882169913, guid: 3fca5df28ff904bd096404c1f7bbb371, type: 3}
+  type: 1
+  worldModel: {fileID: 2919659365420188358, guid: 74ad4da8734ff4052ae4a3b9b0c070f0, type: 3}
+  healAmount: 0
+  slot: 1
+  usableBy: 2
+  attackBonus: 10
+  equipModel: {fileID: 2919659365420188358, guid: 74ad4da8734ff4052ae4a3b9b0c070f0, type: 3}
+  goldAmount: 1

@@ -38,7 +38,7 @@ public class ItemPickup : MonoBehaviour
         glow.type = LightType.Point;
         glow.range = 1.8f;
         glow.intensity = 2.5f;
-        glow.color = item.type == ItemType.Weapon ? new Color(0.5f, 0.8f, 1f) : new Color(1f, 0.85f, 0.4f);
+        glow.color = item.type == ItemType.Equipment ? new Color(0.5f, 0.8f, 1f) : new Color(1f, 0.85f, 0.4f);
         glow.shadows = LightShadows.None;
 
         Vector2 side = Random.insideUnitCircle * 2f;

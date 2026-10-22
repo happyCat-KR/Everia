@@ -291,11 +291,12 @@ MonoBehaviour:
   maxSlots: 8
   slots: []
   gold: 0
-  equippedWeapon: {fileID: 0}
   quickPotion: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
   startingItems:
   - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
     count: 2
+  warriorStartWeapon: {fileID: 11400000, guid: f1e6868b3e91146cf9355a900514d134, type: 2}
+  mageStartWeapon: {fileID: 11400000, guid: 75b859636c8e54427b46d457199d7cc9, type: 2}
   weaponSocket: {fileID: 7558327474713702454}
   pickupSounds:
   - {fileID: 8300000, guid: 1ea6387f018e7440ca417bdff874f68e, type: 3}

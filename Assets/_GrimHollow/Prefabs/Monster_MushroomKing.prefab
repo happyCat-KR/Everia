@@ -418,6 +418,10 @@ MonoBehaviour:
     chance: 1
     minCount: 60
     maxCount: 80
+  - item: {fileID: 11400000, guid: 4f05e9ead8625445ba334e01fcf32a15, type: 2}
+    chance: 1
+    minCount: 1
+    maxCount: 1
 --- !u!1 &5828789043434048221
 GameObject:
   m_ObjectHideFlags: 0

@@ -161,7 +161,7 @@ public class PlayerController : MonoBehaviour
             comboResetTimer -= Time.deltaTime;
         }
 
-        if (Input.GetMouseButton(0) && !IsAttacking)
+        if (Input.GetMouseButton(0) && !IsAttacking && !InventoryUI.IsOpen)
         {
             // 한참 쉬었다 치면 1타부터
             if (comboResetTimer <= 0f)
