@@ -30,6 +30,8 @@ public class ScenePortal : MonoBehaviour
         savedHp = stats.currentHp;
         hasSavedStats = true;
 
+        Inventory.SaveForSceneChange(other.GetComponent<Inventory>());
+
         nextSpawn = targetSpawn;
         SceneManager.LoadScene(targetScene);
     }

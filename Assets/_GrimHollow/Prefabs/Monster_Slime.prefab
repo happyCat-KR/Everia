@@ -353,6 +353,7 @@ GameObject:
   - component: {fileID: 5864259398870647148}
   - component: {fileID: 7405640032990504552}
   - component: {fileID: 5596368997698835979}
+  - component: {fileID: 1479262919843146165}
   m_Layer: 7
   m_Name: Monster_Slime
   m_TagString: Untagged
@@ -552,6 +553,27 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d804bf9e3923e4b4095dc04541998cf7, type: 3}
   - {fileID: 8300000, guid: 229ab2d3bd83742b9818f90259277be1, type: 3}
   hitVfx: {fileID: 5998128949827924514, guid: 48e2d038b16ff459cb1af026e6f955ff, type: 3}
+--- !u!114 &1479262919843146165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056785573093406714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9289e1f28ede04b399b1a71544b6fac4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootTable
+  entries:
+  - item: {fileID: 11400000, guid: 761c21f265be14b91868ff8876fc5c3d, type: 2}
+    chance: 0.8
+    minCount: 2
+    maxCount: 5
+  - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
+    chance: 0.2
+    minCount: 1
+    maxCount: 1
 --- !u!1 &4011352095441457306
 GameObject:
   m_ObjectHideFlags: 0

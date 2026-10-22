@@ -176,6 +176,7 @@ GameObject:
   - component: {fileID: 1274579614565551423}
   - component: {fileID: 7949066503392465665}
   - component: {fileID: 9129186545300181911}
+  - component: {fileID: 1487324861079410236}
   m_Layer: 7
   m_Name: Monster_Orc
   m_TagString: Untagged
@@ -375,6 +376,27 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d804bf9e3923e4b4095dc04541998cf7, type: 3}
   - {fileID: 8300000, guid: 229ab2d3bd83742b9818f90259277be1, type: 3}
   hitVfx: {fileID: 5998128949827924514, guid: 48e2d038b16ff459cb1af026e6f955ff, type: 3}
+--- !u!114 &1487324861079410236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919421977375325485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9289e1f28ede04b399b1a71544b6fac4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootTable
+  entries:
+  - item: {fileID: 11400000, guid: 761c21f265be14b91868ff8876fc5c3d, type: 2}
+    chance: 0.95
+    minCount: 6
+    maxCount: 12
+  - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
+    chance: 0.35
+    minCount: 1
+    maxCount: 1
 --- !u!1 &1313648141494493436
 GameObject:
   m_ObjectHideFlags: 0

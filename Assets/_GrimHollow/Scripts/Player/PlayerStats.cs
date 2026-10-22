@@ -50,6 +50,16 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    public void Heal(int amount)
+    {
+        if (isDead)
+        {
+            return;
+        }
+
+        currentHp = Mathf.Min(currentHp + amount, maxHp);
+    }
+
     public void AddExp(int amount)
     {
         if (isDead)

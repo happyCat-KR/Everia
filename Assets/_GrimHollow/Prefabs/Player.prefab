@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 575183985764100725}
   - component: {fileID: 957357271631168445}
   - component: {fileID: 2208989352194645119}
+  - component: {fileID: 3882616151699924752}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -239,6 +240,33 @@ MonoBehaviour:
   m_IgnoreFromBuild: 1
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffffi
+--- !u!114 &3882616151699924752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3613142287267459479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 897568d90dd0a4d70a517eae788a6bcf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Inventory
+  maxSlots: 8
+  slots: []
+  gold: 0
+  equippedWeapon: {fileID: 0}
+  quickPotion: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
+  startingItems:
+  - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
+    count: 2
+  weaponSocket: {fileID: 7558327474713702454}
+  pickupSounds:
+  - {fileID: 8300000, guid: 1ea6387f018e7440ca417bdff874f68e, type: 3}
+  - {fileID: 8300000, guid: 87b4849b5c8694d0e83ae48cf4e6d8da, type: 3}
+  drinkSounds:
+  - {fileID: 8300000, guid: b08716e68042e45ab8626907da853717, type: 3}
+  - {fileID: 8300000, guid: 7632eaed5506c4bdc8c794de08a7d3c3, type: 3}
 --- !u!1 &8546045079268391101
 GameObject:
   m_ObjectHideFlags: 0
@@ -410,5 +438,10 @@ PrefabInstance:
 --- !u!4 &4728744671215737627 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3361449964361322166, guid: d3135dd5277064a8e868588aaabffd8a, type: 3}
+  m_PrefabInstance: {fileID: 8014618258048308653}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7558327474713702454 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 566668627562390939, guid: d3135dd5277064a8e868588aaabffd8a, type: 3}
   m_PrefabInstance: {fileID: 8014618258048308653}
   m_PrefabAsset: {fileID: 0}

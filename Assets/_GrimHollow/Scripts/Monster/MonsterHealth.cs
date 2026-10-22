@@ -124,6 +124,12 @@ public class MonsterHealth : MonoBehaviour
 
         playerStats.AddExp(expReward);
 
+        LootTable loot = GetComponent<LootTable>();
+        if (loot != null)
+        {
+            loot.Drop();
+        }
+
         // 시체가 길을 막거나 공격에 맞지 않게
         GetComponent<NavMeshAgent>().enabled = false;
         GetComponent<Collider>().enabled = false;

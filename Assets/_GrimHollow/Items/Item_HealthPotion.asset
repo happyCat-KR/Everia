@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad2f7f5a670714ecca16f7e969087338, type: 3}
+  m_Name: Item_HealthPotion
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  displayName: Health Potion
+  icon: {fileID: -7046669974806577948, guid: 351e3bb5c0fcd40c9bb847b983917335, type: 3}
+  type: 0
+  worldModel: {fileID: 1222867746168006281, guid: d5487124b69a14dc88830e7d9f821942, type: 3}
+  healAmount: 40
+  attackBonus: 0
+  equipModel: {fileID: 0}
+  goldAmount: 1
