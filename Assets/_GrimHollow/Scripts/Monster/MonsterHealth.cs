@@ -21,6 +21,9 @@ public class MonsterHealth : MonoBehaviour
     public int expReward = 25;
     private PlayerStats playerStats;
 
+    public AudioClip[] hitSounds;       // 맞을 때
+    public AudioClip[] deathSounds;     // 죽을 때
+
     void Start()
     {
         currentHp = maxHp;
@@ -60,6 +63,7 @@ public class MonsterHealth : MonoBehaviour
         }
 
         currentHp -= damage;
+        Sfx.Play(hitSounds, 0.9f);
 
         // 데미지 숫자 (살짝 랜덤 위치로 겹침 방지)
         Vector3 popupPos = transform.position + Vector3.up * 2.7f + Random.insideUnitSphere * 0.3f;
@@ -106,6 +110,7 @@ public class MonsterHealth : MonoBehaviour
         hpBar.gameObject.SetActive(false);  // 죽으면 숨김
 
         animator.SetTrigger("Die");
+        Sfx.Play(deathSounds, 0.9f);
 
         playerStats.AddExp(expReward);
 

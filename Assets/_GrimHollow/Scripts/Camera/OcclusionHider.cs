@@ -13,7 +13,7 @@ public class OcclusionHider : MonoBehaviour
     void Start()
     {
         target = GameObject.FindWithTag("Player").transform;
-        occludables = FindObjectsByType<Occludable>(FindObjectsSortMode.None);
+        occludables = FindObjectsByType<Occludable>();
     }
 
     void LateUpdate()

@@ -15,6 +15,8 @@ public class PlayerStats : MonoBehaviour
 
     public int ExpToNextLevel => baseExpToLevel * level;
 
+    public AudioClip[] hurtSounds;      // 몬스터에게 맞을 때
+
     void Start()
     {
         currentHp = maxHp;
@@ -30,6 +32,7 @@ public class PlayerStats : MonoBehaviour
         }
 
         currentHp -= damage;
+        Sfx.Play(hurtSounds, 0.8f);
         Debug.Log($"Player HP: {currentHp}/{maxHp}");
 
         if (currentHp <= 0)

@@ -116,6 +116,8 @@ MonoBehaviour:
   attackDamage: 10
   attackCooldown: 1
   hitDelay: 0.4
+  stunTime: 0.4
+  knockbackForce: 4
 --- !u!114 &1735619040502969156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,6 +201,19 @@ MonoBehaviour:
   destroyDelay: 3
   hpBar: {fileID: 1954244131372665852}
   damagePopupPrefab: {fileID: 6186620487275632568, guid: ebff06c63cc4c49eeb0009f00a917b0d, type: 3}
+  expReward: 25
+  hitSounds:
+  - {fileID: 8300000, guid: ebf7fbaba27be49de97619bb7bac0d67, type: 3}
+  - {fileID: 8300000, guid: c6df17678bceb47d8bf8f02203c9c2a6, type: 3}
+  - {fileID: 8300000, guid: ced0ee4801a0743069d1968d53de03f1, type: 3}
+  - {fileID: 8300000, guid: e904619906888418a963ee05d949626e, type: 3}
+  - {fileID: 8300000, guid: bcdfc6425e0e34a22894e7aa1acdd22e, type: 3}
+  deathSounds:
+  - {fileID: 8300000, guid: dacda200ad7f2414a934c07a1d46e9b7, type: 3}
+  - {fileID: 8300000, guid: a805591d8d42840b8ad4a70863d40ee7, type: 3}
+  - {fileID: 8300000, guid: bf926e9f5c14e491e9bcdfd8dce20f69, type: 3}
+  - {fileID: 8300000, guid: d804bf9e3923e4b4095dc04541998cf7, type: 3}
+  - {fileID: 8300000, guid: 229ab2d3bd83742b9818f90259277be1, type: 3}
 --- !u!1 &1611539963082553800
 GameObject:
   m_ObjectHideFlags: 0

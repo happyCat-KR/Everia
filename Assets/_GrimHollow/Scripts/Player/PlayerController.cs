@@ -45,6 +45,12 @@ public class PlayerController : MonoBehaviour
 
     public bool IsDashing => dashTimer > 0f;    // 대시 중 = 무적
 
+    public AudioClip[] swingSounds;         // 칼 휘두르기
+    public AudioClip[] dashSounds;          // 대시
+    public AudioClip[] footstepSounds;      // 발소리
+    public float footstepInterval = 0.32f;  // 발소리 간격 (달리기 속도에 맞춤)
+    private float footstepTimer;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -71,6 +77,7 @@ public class PlayerController : MonoBehaviour
             dashDirection = moveDirection != Vector3.zero ? moveDirection : transform.forward;
             transform.rotation = Quaternion.LookRotation(dashDirection);
             animator.CrossFadeInFixedTime("Dash", 0.05f, 1, 0f);
+            Sfx.Play(dashSounds, 0.8f);
 
             dashTimer = dashTime;
             dashCooldownTimer = dashTime + dashCooldown;
@@ -117,6 +124,7 @@ public class PlayerController : MonoBehaviour
 
             FaceMouse();
             animator.CrossFadeInFixedTime("Attack" + (comboStep + 1), attackBlendTime, 1, 0f);   // 지금 자세에서 부드럽게 넘어감
+            Sfx.Play(swingSounds, 0.7f);
             comboStep = (comboStep + 1) % 2;    // 0 → 1 → 0 (1타 → 2타 반복)
 
             attackTimer = attackBlendTime + 0.05f;     // 애니메이터가 공격 상태로 넘어갈 때까지 잠깐 잠금
@@ -127,6 +135,21 @@ public class PlayerController : MonoBehaviour
         if (IsAttacking)
         {
             moveDirection = Vector3.zero;
+        }
+
+        // 걷는 중이면 일정 간격으로 발소리
+        if (moveDirection != Vector3.zero && controller.isGrounded)
+        {
+            footstepTimer -= Time.deltaTime;
+            if (footstepTimer <= 0f)
+            {
+                Sfx.Play(footstepSounds, 0.35f);
+                footstepTimer = footstepInterval;
+            }
+        }
+        else
+        {
+            footstepTimer = 0f;     // 멈췄다 다시 걸으면 바로 한 발
         }
 
         // 3. 회전: 평소엔 이동 방향, 공격 중엔 마우스 방향으로 빠르게 돌기
