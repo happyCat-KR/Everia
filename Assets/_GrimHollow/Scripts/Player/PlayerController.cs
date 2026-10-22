@@ -54,10 +54,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 1. 이동 입력: WASD (월드 방향 기준)
+        // 1. 이동 입력: WASD (화면 기준 → W는 항상 화면 위쪽)
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 moveDirection = new Vector3(horizontal, 0f, vertical).normalized;
+        Quaternion cameraYaw = Quaternion.Euler(0f, mainCamera.transform.eulerAngles.y, 0f);
+        Vector3 moveDirection = cameraYaw * new Vector3(horizontal, 0f, vertical).normalized;
 
         // 대시: Space → 이동 방향(없으면 바라보는 방향)으로 빠르게. 공격 중이어도 끊고 나감
         if (dashCooldownTimer > 0f)
