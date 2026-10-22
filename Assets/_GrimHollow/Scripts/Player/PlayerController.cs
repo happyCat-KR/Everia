@@ -64,6 +64,13 @@ public class PlayerController : MonoBehaviour
 
     public float SkillCooldownRatio => skillCooldownTimer / skillCooldown;    // HUD용 (1 = 방금 씀, 0 = 사용 가능)
 
+    // 마법사: 근접 판정 대신 불덩이를 쏨 (PlayerClass가 직업에 맞게 설정)
+    public bool isCaster;
+    public Projectile projectilePrefab;
+    public Transform castPoint;             // 불덩이가 나가는 위치 (지팡이 끝 등)
+
+    string AttackStateName => isCaster ? "Cast" : "Attack" + (comboStep + 1);
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -125,7 +132,7 @@ public class PlayerController : MonoBehaviour
         {
             attackRotation = transform.rotation;
             FaceMouse();
-            animator.CrossFadeInFixedTime("Attack2", 0.05f, 1, 0f);
+            animator.CrossFadeInFixedTime(isCaster ? "Cast" : "Attack2", 0.05f, 1, 0f);
             Sfx.Play(skillSounds, 0.9f);
 
             skillCooldownTimer = skillCooldown;
@@ -165,9 +172,9 @@ public class PlayerController : MonoBehaviour
             attackRotation = transform.rotation;    // 마우스 방향을 못 구하면 지금 방향 유지
 
             FaceMouse();
-            animator.CrossFadeInFixedTime("Attack" + (comboStep + 1), attackBlendTime, 1, 0f);   // 지금 자세에서 부드럽게 넘어감
+            animator.CrossFadeInFixedTime(AttackStateName, attackBlendTime, 1, 0f);   // 지금 자세에서 부드럽게 넘어감
             Sfx.Play(swingSounds, 0.7f);
-            comboStep = (comboStep + 1) % 2;    // 0 → 1 → 0 (1타 → 2타 반복)
+            comboStep = isCaster ? 0 : (comboStep + 1) % 2;    // 0 → 1 → 0 (1타 → 2타 반복), 마법사는 한 동작
 
             attackTimer = attackBlendTime + 0.05f;     // 애니메이터가 공격 상태로 넘어갈 때까지 잠깐 잠금
             hitTimer = hitDelay;
@@ -211,7 +218,14 @@ public class PlayerController : MonoBehaviour
             hitTimer -= Time.deltaTime;
             if (hitTimer <= 0f)
             {
-                DealDamage();
+                if (isCaster)
+                {
+                    ShootProjectile();
+                }
+                else
+                {
+                    DealDamage();
+                }
             }
         }
 
@@ -236,7 +250,7 @@ public class PlayerController : MonoBehaviour
     bool IsAttackAnimPlaying()
     {
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(1);
-        bool inAttack = state.IsName("Attack1") || state.IsName("Attack2") || state.IsName("Attack3");
+        bool inAttack = state.IsName("Attack1") || state.IsName("Attack2") || state.IsName("Attack3") || state.IsName("Cast");
         return inAttack && state.normalizedTime < nextAttackPoint;
     }
 
@@ -302,6 +316,20 @@ public class PlayerController : MonoBehaviour
             target.TakeDamage(attackDamage);
             CameraFollow.Shake(0.12f, 0.12f);
         }
+    }
+
+    // 바라보는 방향으로 불덩이 발사
+    void ShootProjectile()
+    {
+        if (projectilePrefab == null)
+        {
+            return;
+        }
+
+        Vector3 start = castPoint != null ? castPoint.position : transform.position + Vector3.up * 1.2f + transform.forward * 0.6f;
+        start.y = transform.position.y + 1.1f;      // 몬스터 몸 높이로 날아가게
+        Projectile p = Instantiate(projectilePrefab, start, Quaternion.LookRotation(attackRotation * Vector3.forward));
+        p.Launch(attackDamage, monsterLayer, obstacleLayer);
     }
 
     // 주변 모든 몬스터에게 데미지 (넉백은 MonsterHealth가 처리)
