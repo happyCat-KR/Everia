@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5668901312363887300}
   - component: {fileID: 4862593364827019604}
+  - component: {fileID: 6016278511028897213}
   m_Layer: 0
   m_Name: Bld_Inn
   m_TagString: Untagged
@@ -90,6 +91,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 6, y: 3, z: 8}
   m_Center: {x: 0, y: 1.5, z: 0}
+--- !u!114 &6016278511028897213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3050872246853227848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a54e970561b6475e94e68b2b194d790, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Occludable
 --- !u!1001 &324334534591665037
 PrefabInstance:
   m_ObjectHideFlags: 0

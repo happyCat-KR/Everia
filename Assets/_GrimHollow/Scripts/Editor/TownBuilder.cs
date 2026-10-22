@@ -131,6 +131,8 @@ public static class TownBuilder
         box.center = new Vector3(0f, WallHeight * 0.5f, 0f);
         box.size = new Vector3(halfX * 2, WallHeight, halfZ * 2);
 
+        root.AddComponent<Occludable>();     // 플레이어를 가리면 숨김
+
         string path = OutDir + "/" + spec.name + ".prefab";
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
         Object.DestroyImmediate(root);

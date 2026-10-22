@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8168222641311452427}
   - component: {fileID: 5402675045381737699}
   - component: {fileID: 8066480937082317068}
+  - component: {fileID: 1321130693151714427}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -153,3 +154,18 @@ MonoBehaviour:
   target: {fileID: 0}
   angle: 55
   distance: 10
+  yaw: 45
+--- !u!114 &1321130693151714427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7322136928272231582}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4da7c7000e0f04d4c931e45ea03e11d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OcclusionHider
+  targetHeight: 1
+  padding: 0.5
