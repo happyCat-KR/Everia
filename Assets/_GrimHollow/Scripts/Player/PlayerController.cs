@@ -40,6 +40,10 @@ public class PlayerController : MonoBehaviour
     public float dashTime = 0.25f;          // 대시 지속 시간 (이동 + 무적) → 12 × 0.25 = 약 3m
     public float dashCooldown = 0.15f;      // 대시 끝나고 다시 쓰기까지
     public int dashStaminaCost = 25;
+
+    public enum DashStyle { Step, Roll }    // Step: 쓱 미끄러지는 대시, Roll: 구르기
+    public DashStyle dashStyle = DashStyle.Step;
+    public DashEffects dashEffects;
     public int attackStaminaCost;           // 공격 1회 스태미나 (PlayerClass가 직업에 맞게 설정)
     private float dashTimer;
     private float dashCooldownTimer;
@@ -84,6 +88,7 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
         stats = GetComponent<PlayerStats>();
+        dashEffects = GetComponent<DashEffects>();
         mainCamera = Camera.main;
     }
 
@@ -105,8 +110,12 @@ public class PlayerController : MonoBehaviour
         {
             dashDirection = moveDirection != Vector3.zero ? moveDirection : transform.forward;
             transform.rotation = Quaternion.LookRotation(dashDirection);
-            animator.CrossFadeInFixedTime("Dash", 0.05f, 1, 0f);
+            animator.CrossFadeInFixedTime(dashStyle == DashStyle.Step ? "DashStep" : "Dash", 0.05f, 1, 0f);
             Sfx.Play(dashSounds, 0.8f);
+            if (dashEffects != null)
+            {
+                dashEffects.Begin(dashDirection, dashSpeed * dashTime);
+            }
 
             dashTimer = dashTime;
             dashCooldownTimer = dashTime + dashCooldown;
@@ -118,6 +127,10 @@ public class PlayerController : MonoBehaviour
         if (IsDashing)
         {
             dashTimer -= Time.deltaTime;
+            if (dashTimer <= 0f && dashEffects != null)
+            {
+                dashEffects.End();
+            }
 
             Vector3 dashVelocity = dashDirection * dashSpeed;
             dashVelocity.y = verticalVelocity;      // 땅에 붙어 있게
