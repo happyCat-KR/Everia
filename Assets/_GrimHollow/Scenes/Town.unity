@@ -20059,6 +20059,8 @@ MonoBehaviour:
   expBar: {fileID: 1527874644}
   levelText: {fileID: 1141573040}
   expText: {fileID: 1108376133}
+  mpBar: {fileID: 2042689940}
+  mpText: {fileID: 2068226233}
   playerController: {fileID: 4668517623799759090}
   skillCooldownFill: {fileID: 2135399411}
 --- !u!114 &541619782
@@ -77348,10 +77350,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1472901057341220300, guid: ae00a6201cd484f71a1ac91cc8a2e7c5, type: 3}
-      propertyPath: moveSpeed
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 3613142287267459479, guid: ae00a6201cd484f71a1ac91cc8a2e7c5, type: 3}
       propertyPath: m_Name
       value: Player

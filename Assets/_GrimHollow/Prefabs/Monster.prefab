@@ -113,10 +113,11 @@ MonoBehaviour:
   detectionRange: 5
   loseRange: 12
   attackRange: 1.5
-  moveSpeed: 2
+  moveSpeed: 3
   attackDamage: 10
   attackCooldown: 1
   hitDelay: 0.4
+  windUp: 0.6
   stunTime: 0.4
   knockbackForce: 4
 --- !u!114 &1735619040502969156
@@ -196,7 +197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ec6eafd421d84f42bf10ea368cdd854, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MonsterHealth
-  maxHp: 30
+  maxHp: 40
   currentHp: 0
   isDead: 0
   destroyDelay: 3
@@ -216,6 +217,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d804bf9e3923e4b4095dc04541998cf7, type: 3}
   - {fileID: 8300000, guid: 229ab2d3bd83742b9818f90259277be1, type: 3}
   hitVfx: {fileID: 5998128949827924514, guid: 48e2d038b16ff459cb1af026e6f955ff, type: 3}
+  poise: 20
+  poiseRecovery: 6
+  staggerImmune: 0
+  telegraphColor: {r: 1, g: 0.55, b: 0.15, a: 1}
 --- !u!114 &8870885802549643975
 MonoBehaviour:
   m_ObjectHideFlags: 0

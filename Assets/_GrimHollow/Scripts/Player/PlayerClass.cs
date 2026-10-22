@@ -26,6 +26,9 @@ public class PlayerClass : MonoBehaviour
     {
         public bool isCaster;
         public float hitDelay = 0.3f;       // 클릭 후 데미지(또는 발사) 시점
+        public float attackCooldown;        // 공격 사이 최소 간격
+        public int attackManaCost;
+        public int skillManaCost;
         public int skillDamage = 25;
         public float skillRadius = 4f;
         public GameObject skillVfx;
@@ -77,6 +80,9 @@ public class PlayerClass : MonoBehaviour
         ClassSettings s = characterClass == CharacterClass.Mage ? mage : warrior;
         controller.isCaster = s.isCaster;
         controller.hitDelay = s.hitDelay;
+        controller.attackCooldown = s.attackCooldown;
+        controller.attackManaCost = s.attackManaCost;
+        controller.skillManaCost = s.skillManaCost;
         controller.skillDamage = s.skillDamage;
         controller.skillRadius = s.skillRadius;
         controller.skillVfx = s.skillVfx;

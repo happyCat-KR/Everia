@@ -17,10 +17,36 @@ public class PlayerStats : MonoBehaviour
 
     public AudioClip[] hurtSounds;      // 몬스터에게 맞을 때
 
+    // 마나: 마법사 공격·스킬에 사용 (연사를 막는 자원)
+    public int maxMp = 100;
+    public float currentMp;
+    public float mpRegen = 6f;          // 초당 회복량
+
     void Start()
     {
         currentHp = maxHp;
+        currentMp = maxMp;
         animator = GetComponentInChildren<Animator>();
+    }
+
+    void Update()
+    {
+        if (!isDead)
+        {
+            currentMp = Mathf.Min(maxMp, currentMp + mpRegen * Time.deltaTime);
+        }
+    }
+
+    // 마나가 충분하면 쓰고 true
+    public bool SpendMp(int cost)
+    {
+        if (currentMp < cost)
+        {
+            return false;
+        }
+
+        currentMp -= cost;
+        return true;
     }
 
     public void TakeDamage(int damage)

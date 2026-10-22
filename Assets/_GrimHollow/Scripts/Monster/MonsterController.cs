@@ -23,6 +23,9 @@ public class MonsterController : MonoBehaviour
     private float attackTimer;
     private float hitTimer;
 
+    public float windUp = 0.6f;         // 공격 전 예고 시간 (몸이 빛남 → 이때 피하면 됨)
+    private float windUpTimer;
+
     public float stunTime = 0.4f;       // 맞으면 멈추는 시간 (경직)
     public float knockbackForce = 4f;   // 밀려나는 세기
     private float stunTimer;
@@ -59,6 +62,21 @@ public class MonsterController : MonoBehaviour
             return;
         }
 
+        // 공격 예고 중: 제자리에서 몸이 빛나다가 끝나면 휘두름 (이 사이에 피하라는 신호)
+        if (windUpTimer > 0f)
+        {
+            windUpTimer -= Time.deltaTime;
+            agent.ResetPath();
+            animator.SetFloat("Speed", 0f);
+            if (windUpTimer <= 0f)
+            {
+                health.SetTelegraph(false);
+                animator.SetTrigger("Attack");
+                hitTimer = hitDelay;
+            }
+            return;
+        }
+
          // 경직 중: 밀려나기만 하고 아무것도 안 함
         if (stunTimer > 0f)
         {
@@ -85,10 +103,10 @@ public class MonsterController : MonoBehaviour
         {
             agent.ResetPath();
 
-            // 멈춰 있는 동안에도 플레이어를 바라보게
+            // 휘두르는 중이 아니면 플레이어를 바라보게 (휘두르기 시작하면 방향 고정 → 옆으로 피할 수 있음)
             Vector3 direction = target.position - transform.position;
             direction.y = 0f;
-            if (direction != Vector3.zero)
+            if (direction != Vector3.zero && hitTimer <= 0f)
             {
                 transform.rotation = Quaternion.LookRotation(direction);
             }
@@ -99,11 +117,11 @@ public class MonsterController : MonoBehaviour
             AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
             bool canAttack = state.IsName("Locomotion") && !animator.IsInTransition(0);
 
-            if (attackTimer >= attackCooldown && canAttack)
+            if (attackTimer >= attackCooldown && canAttack && hitTimer <= 0f)
             {
-                animator.SetTrigger("Attack");
                 attackTimer = 0f;
-                hitTimer = hitDelay;
+                windUpTimer = windUp;
+                health.SetTelegraph(true);
             }
         }
         else if (isChasing)
@@ -121,8 +139,11 @@ public class MonsterController : MonoBehaviour
             hitTimer -= Time.deltaTime;
             if (hitTimer <= 0f)
             {
-                float hitDistance = Vector3.Distance(transform.position, target.position);
-                if (hitDistance <= attackRange + 0.3f)
+                // 사거리 안 + 정면 부채꼴 안에 있을 때만 맞음 (옆이나 뒤로 피하면 빗나감)
+                Vector3 toPlayer = target.position - transform.position;
+                toPlayer.y = 0f;
+                bool inFront = Vector3.Angle(transform.forward, toPlayer) <= 70f;
+                if (toPlayer.magnitude <= attackRange + 0.3f && inFront)
                 {
                     playerStats.TakeDamage(attackDamage);
                 }
@@ -139,15 +160,17 @@ public class MonsterController : MonoBehaviour
         isChasing = true;
     }
 
-    // 맞았을 때: 공격 취소 + 멈춤 + 뒤로 밀림
-    public void Stagger(Vector3 direction)
+    // 경직 게이지가 깨졌을 때: 공격 취소 + 멈춤 (넉백은 스킬 같은 강한 공격만)
+    public void Stagger(Vector3 direction, bool knockbackHit)
     {
         stunTimer = stunTime;
         hitTimer = 0f;          // 휘두르던 공격 취소 (데미지 안 들어감)
+        windUpTimer = 0f;       // 예고 중이던 공격도 취소
+        health.SetTelegraph(false);
         attackTimer = 0f;       // 풀리자마자 바로 공격하지 않게
         agent.ResetPath();
 
         direction.y = 0f;
-        knockback = direction.normalized * knockbackForce;
+        knockback = knockbackHit ? direction.normalized * knockbackForce : Vector3.zero;
     }
 }

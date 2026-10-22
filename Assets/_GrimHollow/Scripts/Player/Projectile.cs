@@ -26,7 +26,7 @@ public class Projectile : MonoBehaviour
         float step = speed * Time.deltaTime;
 
         // 벽에 막히면 그 자리에서 터짐
-        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit wall, step, obstacleLayer))
+        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit wall, step, obstacleLayer, QueryTriggerInteraction.Ignore))
         {
             transform.position = wall.point;
             Explode(null);

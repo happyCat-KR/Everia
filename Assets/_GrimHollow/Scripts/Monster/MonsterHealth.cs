@@ -25,6 +25,15 @@ public class MonsterHealth : MonoBehaviour
     public AudioClip[] deathSounds;     // 죽을 때
     public GameObject hitVfx;           // 맞을 때 불꽃
 
+    // 경직 게이지: 받은 데미지가 쌓여 이 값을 넘으면 잠깐 멈춤 (매번 경직되면 몬스터가 공격을 못 함)
+    public float poise = 20f;
+    public float poiseRecovery = 6f;    // 초당 게이지 회복량
+    public bool staggerImmune;          // 보스: 경직·넉백 면역
+    private float poiseDamage;
+
+    public Color telegraphColor = new Color(1f, 0.55f, 0.15f);    // 공격 예고 때 몸 색
+    private bool telegraphing;
+
     // 생성되는 즉시 준비 (스포너가 만든 그 프레임에 맞아도 에러가 나지 않게)
     void Awake()
     {
@@ -50,6 +59,8 @@ public class MonsterHealth : MonoBehaviour
 
     void Update()
     {
+        poiseDamage = Mathf.Max(0f, poiseDamage - poiseRecovery * Time.deltaTime);
+
         if (flashTimer > 0f)
         {
             flashTimer -= Time.deltaTime;
@@ -60,7 +71,8 @@ public class MonsterHealth : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    // heavy: 스킬처럼 강한 공격 (게이지와 상관없이 경직 + 넉백)
+    public void TakeDamage(int damage, bool heavy = false)
     {
         if (isDead)
         {
@@ -100,12 +112,17 @@ public class MonsterHealth : MonoBehaviour
             isDead = true;
             Die();
         }
-         else
+        else if (!staggerImmune)
         {
-            // 잡몹: 맞을 때마다 움찔 + 밀려남
-            animator.SetTrigger("Hit");
-            Vector3 pushDirection = transform.position - playerStats.transform.position;
-            GetComponent<MonsterController>().Stagger(pushDirection);
+            // 게이지가 깨지거나 강한 공격이면 움찔 (넉백은 강한 공격만)
+            poiseDamage += damage;
+            if (heavy || poiseDamage >= poise)
+            {
+                poiseDamage = 0f;
+                animator.SetTrigger("Hit");
+                Vector3 pushDirection = transform.position - playerStats.transform.position;
+                GetComponent<MonsterController>().Stagger(pushDirection, heavy);
+            }
         }
     }
 
@@ -113,7 +130,18 @@ public class MonsterHealth : MonoBehaviour
     {
         for (int i = 0; i < renderers.Length; i++)
         {
-            renderers[i].material.color = flash ? Color.red : originalColors[i];
+            Color normal = telegraphing ? telegraphColor : originalColors[i];
+            renderers[i].material.color = flash ? Color.red : normal;
+        }
+    }
+
+    // 공격 예고 중에는 몸을 주황색으로 (MonsterController가 켜고 끔)
+    public void SetTelegraph(bool on)
+    {
+        telegraphing = on;
+        if (flashTimer <= 0f)
+        {
+            SetColor(false);
         }
     }
 

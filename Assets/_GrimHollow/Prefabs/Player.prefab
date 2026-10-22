@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06dd2da2250be48b780720d7d8095d6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 7
+  moveSpeed: 3.8
   gravity: -9.81
   nextAttackPoint: 0.9
   attackDamage: 10
@@ -206,6 +206,9 @@ MonoBehaviour:
   isCaster: 0
   projectilePrefab: {fileID: 0}
   castPoint: {fileID: 0}
+  attackCooldown: 0
+  attackManaCost: 0
+  skillManaCost: 0
 --- !u!143 &575183985764100725
 CharacterController:
   m_ObjectHideFlags: 0
@@ -256,6 +259,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: beb09663a64494c25b28bbd687753c56, type: 3}
   - {fileID: 8300000, guid: 2745b28fd87e74525bc06a226639dfc4, type: 3}
   - {fileID: 8300000, guid: f585f187a1e7a402d81a6df28489c25d, type: 3}
+  maxMp: 100
+  currentMp: 0
+  mpRegen: 6
 --- !u!114 &2208989352194645119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,7 +341,10 @@ MonoBehaviour:
     weaponSocket: {fileID: 5218625072607130913}
   warrior:
     isCaster: 0
-    hitDelay: 0.4
+    hitDelay: 0.46
+    attackCooldown: 0
+    attackManaCost: 0
+    skillManaCost: 0
     skillDamage: 25
     skillRadius: 4
     skillVfx: {fileID: 1859499208117265980, guid: 3469df188a3304e39893918ee3211484, type: 3}
@@ -365,6 +374,9 @@ MonoBehaviour:
   mage:
     isCaster: 1
     hitDelay: 0.18
+    attackCooldown: 0.7
+    attackManaCost: 10
+    skillManaCost: 30
     skillDamage: 30
     skillRadius: 4.5
     skillVfx: {fileID: 3275608922800242535, guid: 648794a8dc0744049933111b98256a83, type: 3}

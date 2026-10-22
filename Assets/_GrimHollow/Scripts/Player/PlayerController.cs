@@ -71,10 +71,17 @@ public class PlayerController : MonoBehaviour
 
     string AttackStateName => isCaster ? "Cast" : "Attack" + (comboStep + 1);
 
+    public float attackCooldown;            // 공격 사이 최소 간격 (마법사 연사 제한, 0 = 동작 길이만큼)
+    public int attackManaCost;              // 공격 1회 마나
+    public int skillManaCost;               // Q 1회 마나
+    private float attackCooldownTimer;
+    private PlayerStats stats;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
+        stats = GetComponent<PlayerStats>();
         mainCamera = Camera.main;
     }
 
@@ -128,7 +135,12 @@ public class PlayerController : MonoBehaviour
             skillCooldownTimer -= Time.deltaTime;
         }
 
-        if (Input.GetKeyDown(KeyCode.Q) && skillCooldownTimer <= 0f)
+        if (attackCooldownTimer > 0f)
+        {
+            attackCooldownTimer -= Time.deltaTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q) && skillCooldownTimer <= 0f && stats.SpendMp(skillManaCost))
         {
             attackRotation = transform.rotation;
             FaceMouse();
@@ -161,8 +173,10 @@ public class PlayerController : MonoBehaviour
             comboResetTimer -= Time.deltaTime;
         }
 
-        if (Input.GetMouseButton(0) && !IsAttacking && !InventoryUI.IsOpen)
+        if (Input.GetMouseButton(0) && !IsAttacking && !InventoryUI.IsOpen && attackCooldownTimer <= 0f && stats.SpendMp(attackManaCost))
         {
+            attackCooldownTimer = attackCooldown;
+
             // 한참 쉬었다 치면 1타부터
             if (comboResetTimer <= 0f)
             {
@@ -329,7 +343,7 @@ public class PlayerController : MonoBehaviour
         Vector3 start = castPoint != null ? castPoint.position : transform.position + Vector3.up * 1.2f + transform.forward * 0.6f;
         start.y = transform.position.y + 1.1f;      // 몬스터 몸 높이로 날아가게
         Projectile p = Instantiate(projectilePrefab, start, Quaternion.LookRotation(attackRotation * Vector3.forward));
-        p.Launch(attackDamage, monsterLayer, obstacleLayer);
+        p.Launch(attackDamage, monsterLayer, ~monsterLayer.value);     // 몬스터 말고 부딪히는 건 전부 막힘 (나무, 바위, 집)
     }
 
     // 주변 모든 몬스터에게 데미지 (넉백은 MonsterHealth가 처리)
@@ -346,7 +360,7 @@ public class PlayerController : MonoBehaviour
             MonsterHealth monster = hit.GetComponent<MonsterHealth>();
             if (monster != null && !monster.isDead)
             {
-                monster.TakeDamage(skillDamage);
+                monster.TakeDamage(skillDamage, true);      // 스킬은 강한 공격: 경직 + 넉백
             }
         }
     }
