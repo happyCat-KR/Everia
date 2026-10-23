@@ -158,23 +158,17 @@ MonoBehaviour:
     m_Bits: 256
   turnSpeed: 720
   attackTurnSpeed: 1440
-  dashSpeed: 12
-  dashTime: 0.25
+  attackMoveSpeedMultiplier: 0.45
+  dashSpeed: 11
+  dashTime: 0.14
   dashCooldown: 0.15
-  dashStaminaCost: 25
-  dashStyle: 1
+  dashStyle: 0
   dashEffects: {fileID: 0}
-  attackStaminaCost: 0
   swingSounds:
   - {fileID: 8300000, guid: db966ed1320d64576a0c73a21c750624, type: 3}
-  - {fileID: 8300000, guid: 579e93dd63d7346f89014728c5aa0a2e, type: 3}
-  - {fileID: 8300000, guid: e5085980c32f54aba8c3ca9fadc2fe26, type: 3}
-  - {fileID: 8300000, guid: c1cf8ede1a6724990857eb479fa7465c, type: 3}
   - {fileID: 8300000, guid: f382f2a477b6048109ba2e0fbcbc8f16, type: 3}
   - {fileID: 8300000, guid: e3223ad1433a748f59cfa6cacc45b8ef, type: 3}
   - {fileID: 8300000, guid: d841e10b45523422db61fed5ac70e6b2, type: 3}
-  - {fileID: 8300000, guid: ca898cc3696fa49a384cadeed169a4df, type: 3}
-  - {fileID: 8300000, guid: 1fcca1b171afd4d909c76b586c9cc60a, type: 3}
   - {fileID: 8300000, guid: b7d46b440c133480fbf34ac91efb93d0, type: 3}
   dashSounds:
   - {fileID: 8300000, guid: d4a687231eaeb43d59ffa85ce7c11f41, type: 3}
@@ -205,11 +199,35 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 9ba53058ff8ba4531a51570a4233ff26, type: 3}
   - {fileID: 8300000, guid: fc3a80a3cd5194205ac8cf628792160f, type: 3}
   - {fileID: 8300000, guid: 59ad8ed39844745a3bc9235fc0b76187, type: 3}
+  ironWillManaCost: 15
+  ironWillCooldown: 15
+  ironWillDuration: 5
+  ironWillReduction: 0.3
+  ironWillShieldVfx: {fileID: 1289543790355709915, guid: b99922c2f59b1a542bdd06ae8bee47ae, type: 3}
+  ironWillAuraVfx: {fileID: 7155335147208632822, guid: 97c43495f80a3244fad1301dfafbe252, type: 3}
+  ironWillSounds:
+  - {fileID: 8300000, guid: 43d5f43c9dee3462c8d5ea24efe7df8c, type: 3}
+  spinDamageMultiplier: 1.5
+  spinSlashVfx: {fileID: 7647375919561907788, guid: 035ce8c9cfc34104991ce416daf8aebe, type: 3}
+  chargeManaCost: 20
+  chargeCooldown: 8
+  chargeDistance: 7
+  chargeSpeed: 26
+  chargeDamageMultiplier: 2
+  chargeHitRadius: 1.5
+  chargeStartVfx: {fileID: 5610010966355794069, guid: 803ecf87f61d9fb4f84ba6319ba95c9c, type: 3}
+  chargeTrailVfx: {fileID: 6007584933065334475, guid: 45c1a9f607b571349b0186f437fb0702, type: 3}
+  chargeHitVfx: {fileID: 8500920156052182585, guid: 830e92a3f95c4b04caf8edd648aed9bd, type: 3}
+  chargeSounds:
+  - {fileID: 8300000, guid: db966ed1320d64576a0c73a21c750624, type: 3}
+  - {fileID: 8300000, guid: f382f2a477b6048109ba2e0fbcbc8f16, type: 3}
+  - {fileID: 8300000, guid: e3223ad1433a748f59cfa6cacc45b8ef, type: 3}
+  - {fileID: 8300000, guid: d841e10b45523422db61fed5ac70e6b2, type: 3}
+  - {fileID: 8300000, guid: b7d46b440c133480fbf34ac91efb93d0, type: 3}
   isCaster: 0
   projectilePrefab: {fileID: 0}
   castPoint: {fileID: 0}
   attackCooldown: 0
-  attackManaCost: 0
   skillManaCost: 0
 --- !u!143 &575183985764100725
 CharacterController:
@@ -303,9 +321,9 @@ MonoBehaviour:
   maxSlots: 8
   slots: []
   gold: 0
-  quickPotion: {fileID: 11400000, guid: 1d8e4e97f1dc342c9a486fbc2ec65651, type: 2}
+  quickPotion: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
   startingItems:
-  - item: {fileID: 11400000, guid: 1d8e4e97f1dc342c9a486fbc2ec65651, type: 2}
+  - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
     count: 2
   warriorStartWeapon: {fileID: 11400000, guid: f1e6868b3e91146cf9355a900514d134, type: 2}
   mageStartWeapon: {fileID: 11400000, guid: 75b859636c8e54427b46d457199d7cc9, type: 2}
@@ -348,25 +366,19 @@ MonoBehaviour:
     weaponSocket: {fileID: 5218625072607130913}
   warrior:
     isCaster: 0
-    hitDelay: 0.46
+    hitDelay: 0.31
     attackCooldown: 0
-    attackManaCost: 0
-    attackStaminaCost: 10
-    skillManaCost: 0
+    skillManaCost: 20
+    skillCooldown: 6
     skillDamage: 25
     skillRadius: 4
     skillVfx: {fileID: 1859499208117265980, guid: 3469df188a3304e39893918ee3211484, type: 3}
     skillDustVfx: {fileID: 4420950709411320365, guid: cca321b27b85f487c91543d603062577, type: 3}
     attackSounds:
     - {fileID: 8300000, guid: db966ed1320d64576a0c73a21c750624, type: 3}
-    - {fileID: 8300000, guid: 579e93dd63d7346f89014728c5aa0a2e, type: 3}
-    - {fileID: 8300000, guid: e5085980c32f54aba8c3ca9fadc2fe26, type: 3}
-    - {fileID: 8300000, guid: c1cf8ede1a6724990857eb479fa7465c, type: 3}
     - {fileID: 8300000, guid: f382f2a477b6048109ba2e0fbcbc8f16, type: 3}
     - {fileID: 8300000, guid: e3223ad1433a748f59cfa6cacc45b8ef, type: 3}
     - {fileID: 8300000, guid: d841e10b45523422db61fed5ac70e6b2, type: 3}
-    - {fileID: 8300000, guid: ca898cc3696fa49a384cadeed169a4df, type: 3}
-    - {fileID: 8300000, guid: 1fcca1b171afd4d909c76b586c9cc60a, type: 3}
     - {fileID: 8300000, guid: b7d46b440c133480fbf34ac91efb93d0, type: 3}
     skillSounds:
     - {fileID: 8300000, guid: 948c55ac215ae4ef68d16ebb74becf22, type: 3}
@@ -383,9 +395,8 @@ MonoBehaviour:
     isCaster: 1
     hitDelay: 0.18
     attackCooldown: 0.7
-    attackManaCost: 10
-    attackStaminaCost: 0
     skillManaCost: 30
+    skillCooldown: 5
     skillDamage: 30
     skillRadius: 4.5
     skillVfx: {fileID: 3275608922800242535, guid: 648794a8dc0744049933111b98256a83, type: 3}

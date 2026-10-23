@@ -542,11 +542,13 @@ MonoBehaviour:
   damagePopupPrefab: {fileID: 6186620487275632568, guid: ebff06c63cc4c49eeb0009f00a917b0d, type: 3}
   expReward: 15
   hitSounds:
-  - {fileID: 8300000, guid: ebf7fbaba27be49de97619bb7bac0d67, type: 3}
-  - {fileID: 8300000, guid: c6df17678bceb47d8bf8f02203c9c2a6, type: 3}
-  - {fileID: 8300000, guid: ced0ee4801a0743069d1968d53de03f1, type: 3}
-  - {fileID: 8300000, guid: e904619906888418a963ee05d949626e, type: 3}
-  - {fileID: 8300000, guid: bcdfc6425e0e34a22894e7aa1acdd22e, type: 3}
+  - {fileID: 8300000, guid: 3c8dd2630ca9f40c1b1fb0ed502fef18, type: 3}
+  - {fileID: 8300000, guid: 04ea1c947e4364bf19e4fa36367dd331, type: 3}
+  hitLayerSounds:
+  - {fileID: 8300000, guid: 25df7a371def04d80b5dff93bdc0a05d, type: 3}
+  - {fileID: 8300000, guid: df1da1c44126947d194cee029da4f2a4, type: 3}
+  - {fileID: 8300000, guid: 961282d04d0794192a994d60cb958ddd, type: 3}
+  - {fileID: 8300000, guid: f65dcb518c8cf444aaecd00acde6b072, type: 3}
   deathSounds:
   - {fileID: 8300000, guid: dacda200ad7f2414a934c07a1d46e9b7, type: 3}
   - {fileID: 8300000, guid: a805591d8d42840b8ad4a70863d40ee7, type: 3}
@@ -578,7 +580,7 @@ MonoBehaviour:
     chance: 0.8
     minCount: 2
     maxCount: 5
-  - item: {fileID: 11400000, guid: 1d8e4e97f1dc342c9a486fbc2ec65651, type: 2}
+  - item: {fileID: 11400000, guid: edb262a8e69f643768b190949badf220, type: 2}
     chance: 0.08
     minCount: 1
     maxCount: 1

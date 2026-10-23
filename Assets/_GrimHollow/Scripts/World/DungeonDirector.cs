@@ -3,25 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-// 던전 진행: 입장 → 철문 닫힘 → 웨이브들 → 보스 등장 → 보스전 중 쫄몹 소환 → 클리어(철문 열림)
+// 던전 진행: 방마다 몬스터가 미리 배치됨 → 중간보스가 열쇠를 떨어뜨림 → 열쇠로 보스 방 철문을 열고 입장 → 철문 닫힘 → 보스전 → 클리어(철문 열림)
 public class DungeonDirector : MonoBehaviour
 {
     [Serializable]
-    public class Wave
+    public class Encounter
     {
-        public GameObject monsterA;
-        public int countA = 3;
-        public GameObject monsterB;
-        public int countB;
+        public string room;             // DungeonRoom.displayName
+        public GameObject monster;
+        public int count = 3;
     }
 
-    enum Stage { WaitingEntry, Waves, BossIntro, Boss, Cleared }
+    enum Stage { Exploring, BossIntro, Boss, Cleared }
 
-    public DungeonGate gate;
-    public ScenePortal exitPortal;          // 클리어 전에는 꺼 둠
-    public Wave[] waves;
+    public static bool HasKey;
+
+    public DungeonGate gate;                // 보스 방 철문
+    public Encounter[] encounters;
+    public string miniBossRoom = "북서쪽 방";
+    public GameObject miniBossPrefab;       // 열쇠를 가진 중간보스 (일반 몬스터를 키워서 씀)
+    public float miniBossScale = 1.6f;
+    public int miniBossHpMultiplier = 5;
     public GameObject bossPrefab;
-    public Vector3 bossSpawn = new Vector3(0f, 0f, 9f);
 
     [Header("Boss adds (쫄몹)")]
     public GameObject addPhase1;
@@ -31,99 +34,110 @@ public class DungeonDirector : MonoBehaviour
     public int maxAdds = 4;
 
     [Header("Spawn")]
-    public float roomHalf = 12.5f;          // 몬스터가 나타날 수 있는 범위
+    public float roomMargin = 3f;           // 벽에서 이만큼 안쪽에 배치
     public float minDistanceFromPlayer = 7f;
     public GameObject spawnVfx;
     public AudioClip[] spawnSounds;
-    public float entryZ = -9f;              // 플레이어가 이 선을 넘으면 입장으로 침
 
-    private Stage stage = Stage.WaitingEntry;
+    private Stage stage = Stage.Exploring;
     private Transform player;
-    private int waveIndex;
+    private DungeonRoom[] rooms;
+    private DungeonRoom bossRoom;
+    private MonsterHealth miniBoss;
+    private bool keyDropped;
     private float timer;
-    private bool waveStarted;
-    private readonly List<MonsterHealth> alive = new List<MonsterHealth>();
+    private readonly List<MonsterHealth> adds = new List<MonsterHealth>();
     private MonsterHealth boss;
     private BossController bossController;
     private float addTimer;
 
     void Start()
     {
+        HasKey = false;
         player = GameObject.FindWithTag("Player").transform;
-        if (exitPortal != null)
+        rooms = FindObjectsByType<DungeonRoom>();
+        foreach (DungeonRoom r in rooms)
         {
-            exitPortal.enabled = false;
+            r.visited = r.kind == DungeonRoom.Kind.Start;
+            if (r.kind == DungeonRoom.Kind.Boss)
+            {
+                bossRoom = r;
+            }
         }
+
+        gate.CloseInstant();        // 열쇠로 열 때까지 잠김
+
+        foreach (Encounter e in encounters)
+        {
+            DungeonRoom room = FindRoom(e.room);
+            if (room == null)
+            {
+                Debug.LogWarning("방을 찾을 수 없음: " + e.room);
+                continue;
+            }
+            SpawnInRoom(room, e.monster, e.count, false, false);
+        }
+
+        DungeonRoom miniRoom = FindRoom(miniBossRoom);
+        if (miniRoom != null && miniBossPrefab != null)
+        {
+            miniBoss = SpawnInRoom(miniRoom, miniBossPrefab, 1, false, true);
+        }
+    }
+
+    DungeonRoom FindRoom(string roomName)
+    {
+        foreach (DungeonRoom r in rooms)
+        {
+            if (r.displayName == roomName)
+            {
+                return r;
+            }
+        }
+        return null;
     }
 
     void Update()
     {
-        alive.RemoveAll(m => m == null || m.isDead);
+        adds.RemoveAll(m => m == null || m.isDead);
 
         switch (stage)
         {
-            case Stage.WaitingEntry: UpdateEntry(); break;
-            case Stage.Waves: UpdateWaves(); break;
+            case Stage.Exploring: UpdateExploring(); break;
             case Stage.BossIntro: UpdateBossIntro(); break;
             case Stage.Boss: UpdateBoss(); break;
         }
     }
 
-    void UpdateEntry()
+    void UpdateExploring()
     {
-        if (player.position.z < entryZ)
+        // 처음 들어간 방 이름을 알려 줌 (미니맵도 이 정보를 씀)
+        foreach (DungeonRoom r in rooms)
         {
-            return;
-        }
-
-        gate.Close();
-        stage = Stage.Waves;
-        waveIndex = 0;
-        timer = 2.0f;
-        waveStarted = false;
-        UIBanner.Show("던전 1층", "게이트가 닫혔다", 2.2f);
-    }
-
-    void UpdateWaves()
-    {
-        timer -= Time.deltaTime;
-
-        if (!waveStarted)
-        {
-            if (timer <= 0f)
+            if (!r.visited && r.kind != DungeonRoom.Kind.Boss && r.Contains(player.position))
             {
-                StartWave(waves[waveIndex]);
-                waveStarted = true;
-            }
-            return;
-        }
-
-        // 이번 웨이브를 다 잡으면 잠깐 쉬고 다음으로
-        if (alive.Count == 0)
-        {
-            waveIndex++;
-            waveStarted = false;
-            timer = 3f;
-
-            if (waveIndex >= waves.Length)
-            {
-                BeginBossIntro();
+                r.visited = true;
+                UIBanner.Show(r.displayName, "", 1.4f);
             }
         }
-    }
 
-    void StartWave(Wave wave)
-    {
-        UIBanner.Show("WAVE " + (waveIndex + 1), waveIndex == waves.Length - 1 ? "마지막 웨이브" : "", 1.4f);
-        Spawn(wave.monsterA, wave.countA);
-        Spawn(wave.monsterB, wave.countB);
-    }
+        // 중간보스를 잡으면 열쇠
+        if (!keyDropped && miniBoss != null && miniBoss.isDead)
+        {
+            keyDropped = true;
+            KeyPickup.Spawn(miniBoss.transform.position);
+            UIBanner.Show("열쇠가 떨어졌다", "", 1.8f);
+        }
 
-    void BeginBossIntro()
-    {
-        stage = Stage.BossIntro;
-        timer = 3.5f;       // 웨이브 사이 정적 → 보스 등장
-        UIBanner.Show("MUSHROOM KING", "던전의 주인", 2.6f);
+        // 보스 방에 들어서면 철문이 닫히고 보스 등장
+        if (bossRoom != null && bossRoom.Contains(player.position))
+        {
+            bossRoom.visited = true;
+            gate.Close();
+            stage = Stage.BossIntro;
+            timer = 3.5f;       // 정적 → 보스 등장
+            UIBanner.Show("MUSHROOM KING", "던전의 주인", 2.6f);
+        }
     }
 
     void UpdateBossIntro()
@@ -145,7 +159,7 @@ public class DungeonDirector : MonoBehaviour
 
     void SpawnBoss()
     {
-        Vector3 pos = SamplePoint(bossSpawn);
+        Vector3 pos = SamplePoint(bossRoom.transform.position + Vector3.forward * 4f);
         GameObject go = Instantiate(bossPrefab, pos, Quaternion.LookRotation(player.position - pos));
         boss = go.GetComponent<MonsterHealth>();
         bossController = go.GetComponent<BossController>();
@@ -176,10 +190,10 @@ public class DungeonDirector : MonoBehaviour
 
         // 쫄몹: 일정 간격으로 (2페이즈에선 오크), 너무 많아지지 않게
         addTimer -= Time.deltaTime;
-        if (addTimer <= 0f && alive.Count < maxAdds)
+        if (addTimer <= 0f && adds.Count < maxAdds)
         {
             addTimer = addInterval;
-            Spawn(bossController.InPhase2 && addPhase2 != null ? addPhase2 : addPhase1, addsPerBatch);
+            SpawnInRoom(bossRoom, bossController.InPhase2 && addPhase2 != null ? addPhase2 : addPhase1, addsPerBatch, true, false);
         }
     }
 
@@ -188,52 +202,70 @@ public class DungeonDirector : MonoBehaviour
         stage = Stage.Cleared;
 
         // 남은 쫄몹 정리
-        foreach (MonsterHealth m in alive)
+        foreach (MonsterHealth m in adds)
         {
             m.TakeDamage(9999);
         }
 
         gate.Open();
-        if (exitPortal != null)
-        {
-            exitPortal.enabled = true;
-        }
-        UIBanner.Show("DUNGEON CLEARED", "철문이 열렸다. 마을로 돌아가자", 3.5f);
+        UIBanner.Show("DUNGEON CLEARED", "철문이 열렸다. 입구의 포탈로 돌아가자", 3.5f);
     }
 
     // ───── 소환 ─────
-    void Spawn(GameObject prefab, int count)
+    // chase: 처음부터 플레이어를 쫓고 놓치지 않음 (보스 쫄몹) / 아니면 가만히 있다가 가까이 오면 반응
+    MonsterHealth SpawnInRoom(DungeonRoom room, GameObject prefab, int count, bool chase, bool mini)
     {
         if (prefab == null)
         {
-            return;
+            return null;
         }
 
+        MonsterHealth last = null;
         for (int i = 0; i < count; i++)
         {
-            Vector3 pos = RandomSpawnPoint();
-            GameObject go = Instantiate(prefab, pos, Quaternion.LookRotation(player.position - pos));
+            Vector3 pos = RandomPoint(room);
+            Quaternion look = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
+            GameObject go = Instantiate(prefab, pos, look);
             MonsterHealth mh = go.GetComponent<MonsterHealth>();
-            alive.Add(mh);
-
-            // 던전에서는 처음부터 플레이어를 쫓고, 멀어져도 놓치지 않음
             MonsterController mc = go.GetComponent<MonsterController>();
-            mc.loseRange = 999f;
-            mc.Aggro();
+            last = mh;
 
-            if (spawnVfx != null)
+            if (mini)
             {
-                Destroy(Instantiate(spawnVfx, pos + Vector3.up * 0.1f, Quaternion.identity), 3f);
+                go.transform.localScale *= miniBossScale;
+                mh.maxHp *= miniBossHpMultiplier;
+                mh.currentHp = mh.maxHp;
+                mh.expReward *= 4;
+                mc.attackDamage = Mathf.RoundToInt(mc.attackDamage * 1.5f);
+            }
+
+            if (chase)
+            {
+                adds.Add(mh);
+                mc.loseRange = 999f;
+                mc.Aggro();
+                if (spawnVfx != null)
+                {
+                    Destroy(Instantiate(spawnVfx, pos + Vector3.up * 0.1f, Quaternion.identity), 3f);
+                }
             }
         }
-        Sfx.Play(spawnSounds, 0.8f);
+
+        if (chase)
+        {
+            Sfx.Play(spawnSounds, 0.8f);
+        }
+        return last;
     }
 
-    Vector3 RandomSpawnPoint()
+    Vector3 RandomPoint(DungeonRoom room)
     {
+        Bounds b = room.Bounds;
         for (int i = 0; i < 30; i++)
         {
-            Vector3 p = new Vector3(UnityEngine.Random.Range(-roomHalf, roomHalf), 0f, UnityEngine.Random.Range(-roomHalf + 4f, roomHalf));
+            Vector3 p = new Vector3(
+                UnityEngine.Random.Range(b.min.x + roomMargin, b.max.x - roomMargin), 0f,
+                UnityEngine.Random.Range(b.min.z + roomMargin, b.max.z - roomMargin));
             Vector3 flat = p - player.position;
             flat.y = 0f;
             if (flat.magnitude >= minDistanceFromPlayer && NavMesh.SamplePosition(p, out NavMeshHit hit, 1.5f, NavMesh.AllAreas))
@@ -241,7 +273,7 @@ public class DungeonDirector : MonoBehaviour
                 return hit.position;
             }
         }
-        return SamplePoint(bossSpawn);
+        return SamplePoint(room.transform.position);
     }
 
     static Vector3 SamplePoint(Vector3 p)

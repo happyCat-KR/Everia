@@ -19,6 +19,15 @@ public class DungeonGate : MonoBehaviour
         blocker.enabled = false;
     }
 
+    // 연출 없이 바로 닫힌 상태로 (씬 시작 때)
+    public void CloseInstant()
+    {
+        StopAllCoroutines();
+        bars.localPosition = Vector3.zero;
+        blocker.enabled = true;
+        IsClosed = true;
+    }
+
     public void Close()
     {
         Move(0f, true);

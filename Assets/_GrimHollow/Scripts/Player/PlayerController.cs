@@ -33,18 +33,17 @@ public class PlayerController : MonoBehaviour
 
     public float turnSpeed = 720f;     // 초당 회전 각도 (720 = 0.25초에 반 바퀴)
 
-    public float attackTurnSpeed = 1440f;   // 공격할 때 마우스 쪽으로 도는 속도 (1440 = 0.125초에 반 바퀴)
+    public float attackTurnSpeed = 1440f;   // 마우스 쪽으로 도는 속도 (1440 = 0.125초에 반 바퀴)
+    public float attackMoveSpeedMultiplier = 0.45f;     // 공격 중 이동 속도 배율 (걷는 느낌)
     private Quaternion attackRotation;      // 공격할 때 바라볼 방향
 
-    public float dashSpeed = 12f;           // 대시 속도
-    public float dashTime = 0.25f;          // 대시 지속 시간 (이동 + 무적) → 12 × 0.25 = 약 3m
+    public float dashSpeed = 11f;           // 대시 속도
+    public float dashTime = 0.14f;          // 대시 지속 시간 (이동 + 무적) → 11 × 0.14 = 약 1.5m
     public float dashCooldown = 0.15f;      // 대시 끝나고 다시 쓰기까지
-    public int dashStaminaCost = 25;
 
     public enum DashStyle { Step, Roll }    // Step: 쓱 미끄러지는 대시, Roll: 구르기
     public DashStyle dashStyle = DashStyle.Step;
     public DashEffects dashEffects;
-    public int attackStaminaCost;           // 공격 1회 스태미나 (PlayerClass가 직업에 맞게 설정)
     private float dashTimer;
     private float dashCooldownTimer;
     private Vector3 dashDirection;
@@ -79,6 +78,65 @@ public class PlayerController : MonoBehaviour
 
     public float SkillCooldownRatio => skillCooldownTimer / skillCooldown;    // HUD용 (1 = 방금 씀, 0 = 사용 가능)
 
+    // 전사 스킬: Q 강철의 의지(방어 버프) / E 회전 베기(주변 광역, 위의 skill* 값 사용) / 우클릭 돌진 베기
+    // 마법사는 Q 하나(주변 광역)만 씀
+    public enum SkillSlot { IronWill, Spin, Charge }
+
+    [Header("Warrior - 강철의 의지 (Q)")]
+    public int ironWillManaCost = 15;
+    public float ironWillCooldown = 15f;
+    public float ironWillDuration = 5f;
+    [Range(0f, 1f)] public float ironWillReduction = 0.3f;     // 받는 피해 감소
+    public GameObject ironWillShieldVfx;
+    public GameObject ironWillAuraVfx;
+    public AudioClip[] ironWillSounds;
+
+    [Header("Warrior - 회전 베기 (E)")]
+    public float spinDamageMultiplier = 1.5f;       // 일반공격 데미지 대비
+    public GameObject spinSlashVfx;
+
+    [Header("Warrior - 돌진 베기 (우클릭)")]
+    public int chargeManaCost = 20;
+    public float chargeCooldown = 8f;
+    public float chargeDistance = 7f;
+    public float chargeSpeed = 26f;
+    public float chargeDamageMultiplier = 2f;
+    public float chargeHitRadius = 1.5f;
+    public GameObject chargeStartVfx;
+    public GameObject chargeTrailVfx;
+    public GameObject chargeHitVfx;
+    public AudioClip[] chargeSounds;
+
+    private float ironWillTimer;
+    private float ironWillCooldownTimer;
+    private float chargeTimer;
+    private float chargeCooldownTimer;
+    private Vector3 chargeDirection;
+
+    public bool IronWillActive => ironWillTimer > 0f;
+    public bool IsCharging => chargeTimer > 0f;
+    public float DamageTakenMultiplier => ironWillTimer > 0f ? 1f - ironWillReduction : 1f;
+
+    public float CooldownRemaining(SkillSlot slot)
+    {
+        switch (slot)
+        {
+            case SkillSlot.IronWill: return ironWillCooldownTimer;
+            case SkillSlot.Spin: return skillCooldownTimer;
+            default: return chargeCooldownTimer;
+        }
+    }
+
+    public float CooldownTotal(SkillSlot slot)
+    {
+        switch (slot)
+        {
+            case SkillSlot.IronWill: return ironWillCooldown;
+            case SkillSlot.Spin: return skillCooldown;
+            default: return chargeCooldown;
+        }
+    }
+
     // 마법사: 근접 판정 대신 불덩이를 쏨 (PlayerClass가 직업에 맞게 설정)
     public bool isCaster;
     public Projectile projectilePrefab;
@@ -87,7 +145,6 @@ public class PlayerController : MonoBehaviour
     string AttackStateName => isCaster ? "Cast" : "Attack" + (comboStep + 1);
 
     public float attackCooldown;            // 공격 사이 최소 간격 (마법사 연사 제한, 0 = 동작 길이만큼)
-    public int attackManaCost;              // 공격 1회 마나
     public int skillManaCost;               // Q 1회 마나
     private float attackCooldownTimer;
     private PlayerStats stats;
@@ -99,10 +156,21 @@ public class PlayerController : MonoBehaviour
         stats = GetComponent<PlayerStats>();
         dashEffects = GetComponent<DashEffects>();
         mainCamera = Camera.main;
+
+        // 전사 스킬 바 (마법사와 타이틀 미리보기에는 안 만듦)
+        PlayerClass playerClass = GetComponent<PlayerClass>();
+        if (!isCaster && playerClass != null && playerClass.applyOnAwake && FindAnyObjectByType<PlayerHUD>() != null)
+        {
+            SkillBar.Create(this);
+        }
     }
 
     void Update()
     {
+        if (ironWillTimer > 0f) ironWillTimer -= Time.deltaTime;
+        if (ironWillCooldownTimer > 0f) ironWillCooldownTimer -= Time.deltaTime;
+        if (chargeCooldownTimer > 0f) chargeCooldownTimer -= Time.deltaTime;
+
         // 1. 이동 입력: WASD (화면 기준 → W는 항상 화면 위쪽)
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
@@ -122,10 +190,17 @@ public class PlayerController : MonoBehaviour
             dashCooldownTimer -= Time.deltaTime;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && !IsDashing && dashCooldownTimer <= 0f && stats.SpendStamina(dashStaminaCost))
+        if (Input.GetKeyDown(KeyCode.Space) && !IsDashing && !IsCharging && dashCooldownTimer <= 0f)
         {
             dashDirection = moveDirection != Vector3.zero ? moveDirection : transform.forward;
-            transform.rotation = Quaternion.LookRotation(dashDirection);
+            if (dashStyle == DashStyle.Roll)
+            {
+                transform.rotation = Quaternion.LookRotation(dashDirection);    // 구르기는 구르는 방향으로 몸을 돌림
+            }
+            else if (TryGetMouseDirection(out Vector3 dashFacing))
+            {
+                transform.rotation = Quaternion.LookRotation(dashFacing);       // 대시는 마우스를 본 채로 미끄러짐
+            }
             animator.CrossFadeInFixedTime(dashStyle == DashStyle.Step ? "DashStep" : "Dash", 0.05f, 1, 0f);
             Sfx.Play(dashSounds, 0.8f);
             if (dashEffects != null)
@@ -154,6 +229,12 @@ public class PlayerController : MonoBehaviour
             return;     // 대시 중에는 공격·이동·회전 처리 안 함
         }
 
+        if (IsCharging)
+        {
+            UpdateCharge();
+            return;     // 돌진 중에도 다른 입력은 받지 않음
+        }
+
         // 2. 공격: 좌클릭 → 그 순간 마우스 쪽으로 돌아서 휘두름
         if (attackTimer > 0f)
         {
@@ -171,7 +252,23 @@ public class PlayerController : MonoBehaviour
             attackCooldownTimer -= Time.deltaTime;
         }
 
-        if (Input.GetKeyDown(KeyCode.Q) && skillCooldownTimer <= 0f && stats.SpendMp(skillManaCost))
+        // 전사: Q 강철의 의지, E 회전 베기, 우클릭 돌진 베기 / 마법사: Q 광역
+        if (!isCaster)
+        {
+            if (Input.GetKeyDown(KeyCode.Q) && ironWillCooldownTimer <= 0f && stats.SpendMp(ironWillManaCost))
+            {
+                UseIronWill();
+            }
+
+            if (Input.GetMouseButtonDown(1) && !InventoryUI.IsOpen && chargeCooldownTimer <= 0f && stats.SpendMp(chargeManaCost))
+            {
+                StartCharge();
+                return;
+            }
+        }
+
+        KeyCode spinKey = isCaster ? KeyCode.Q : KeyCode.E;
+        if (Input.GetKeyDown(spinKey) && skillCooldownTimer <= 0f && stats.SpendMp(skillManaCost))
         {
             attackRotation = transform.rotation;
             FaceMouse();
@@ -204,10 +301,9 @@ public class PlayerController : MonoBehaviour
             comboResetTimer -= Time.deltaTime;
         }
 
-        if (Input.GetMouseButton(0) && !IsAttacking && !InventoryUI.IsOpen && attackCooldownTimer <= 0f && stats.currentStamina >= attackStaminaCost && stats.SpendMp(attackManaCost))
+        if (Input.GetMouseButton(0) && !IsAttacking && !InventoryUI.IsOpen && attackCooldownTimer <= 0f)
         {
             attackCooldownTimer = attackCooldown;
-            stats.SpendStamina(attackStaminaCost);
 
             // 한참 쉬었다 치면 1타부터
             if (comboResetTimer <= 0f)
@@ -219,18 +315,15 @@ public class PlayerController : MonoBehaviour
 
             FaceMouse();
             animator.CrossFadeInFixedTime(AttackStateName, attackBlendTime, 1, 0f);   // 지금 자세에서 부드럽게 넘어감
-            Sfx.Play(swingSounds, 0.7f);
+            Sfx.PlayExclusive(swingSounds, 0.7f, 0.6f);    // 빠르게 연속 공격해도 겹치지 않게 하나씩 짧게
             comboStep = isCaster ? 0 : (comboStep + 1) % 2;    // 0 → 1 → 0 (1타 → 2타 반복), 마법사는 한 동작
 
             attackTimer = attackBlendTime + 0.05f;     // 애니메이터가 공격 상태로 넘어갈 때까지 잠깐 잠금
             hitTimer = hitDelay;
         }
 
-        // 공격 중에는 제자리에 멈춤
-        if (IsAttacking)
-        {
-            moveDirection = Vector3.zero;
-        }
+        // 공격 중에도 움직일 수 있지만 걷는 속도로 느려짐
+        float speedMultiplier = IsAttacking ? attackMoveSpeedMultiplier : 1f;
 
         // 걷는 중이면 일정 간격으로 발소리
         if (moveDirection != Vector3.zero && controller.isGrounded)
@@ -247,15 +340,10 @@ public class PlayerController : MonoBehaviour
             footstepTimer = 0f;     // 멈췄다 다시 걸으면 바로 한 발
         }
 
-        // 3. 회전: 평소엔 이동 방향, 공격 중엔 마우스 방향으로 빠르게 돌기
-        if (IsAttacking)
+        // 3. 회전: 항상 마우스 쪽을 바라봄 (이동 방향과 무관 → 옆걸음, 뒷걸음)
+        if (TryGetMouseDirection(out Vector3 mouseDirection))
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, attackRotation, attackTurnSpeed * Time.deltaTime);
-        }
-        else if (moveDirection != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(mouseDirection), attackTurnSpeed * Time.deltaTime);
         }
 
         // 휘두르는 타이밍에 데미지
@@ -276,7 +364,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // 4. 캐릭터 기준 방향으로 변환 → 애니메이션
-        Vector3 localMove = transform.InverseTransformDirection(moveDirection);
+        Vector3 localMove = transform.InverseTransformDirection(moveDirection) * speedMultiplier;     // 느려지면 걷는 동작으로 섞임
         animator.SetFloat("MoveX", localMove.x, 0.1f, Time.deltaTime);
         animator.SetFloat("MoveZ", localMove.z, 0.1f, Time.deltaTime);
 
@@ -287,7 +375,7 @@ public class PlayerController : MonoBehaviour
         }
         verticalVelocity += gravity * Time.deltaTime;
 
-        Vector3 velocity = moveDirection * moveSpeed;
+        Vector3 velocity = moveDirection * (moveSpeed * speedMultiplier);
         velocity.y = verticalVelocity;
         controller.Move(velocity * Time.deltaTime);
     }
@@ -298,6 +386,29 @@ public class PlayerController : MonoBehaviour
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(1);
         bool inAttack = state.IsName("Attack1") || state.IsName("Attack2") || state.IsName("Attack3") || state.IsName("Cast");
         return inAttack && state.normalizedTime < nextAttackPoint;
+    }
+
+    // 마우스가 가리키는 바닥 지점 쪽 방향 (캐릭터와 거의 겹치면 false → 방향 유지)
+    bool TryGetMouseDirection(out Vector3 direction)
+    {
+        direction = Vector3.zero;
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, transform.position);
+
+        if (!groundPlane.Raycast(ray, out float enter))
+        {
+            return false;
+        }
+
+        direction = ray.GetPoint(enter) - transform.position;
+        direction.y = 0f;
+        if (direction.sqrMagnitude <= 0.09f)
+        {
+            return false;
+        }
+
+        direction.Normalize();
+        return true;
     }
 
     void FaceMouse()
@@ -384,7 +495,12 @@ public class PlayerController : MonoBehaviour
         Vector3 feet = transform.position + Vector3.up * 0.05f;
         SpawnVfx(skillVfx, feet);
         SpawnVfx(skillDustVfx, feet);
+        if (!isCaster)
+        {
+            VfxLifetime.Spawn(spinSlashVfx, feet, Quaternion.identity, 0.9f);
+        }
         CameraFollow.Shake(0.3f, 0.25f);
+        int damage = isCaster ? skillDamage : Mathf.RoundToInt(attackDamage * spinDamageMultiplier);
 
         Collider[] hits = Physics.OverlapSphere(transform.position + Vector3.up, skillRadius, monsterLayer);
         foreach (Collider hit in hits)
@@ -392,9 +508,93 @@ public class PlayerController : MonoBehaviour
             MonsterHealth monster = hit.GetComponent<MonsterHealth>();
             if (monster != null && !monster.isDead)
             {
-                monster.TakeDamage(skillDamage, true);      // 스킬은 강한 공격: 경직 + 넉백
+                monster.TakeDamage(damage, true);      // 스킬은 강한 공격: 경직 + 넉백
             }
         }
+    }
+
+    // 강철의 의지: 잠깐 동안 받는 피해가 줄어듦 (이동·공격은 그대로 가능)
+    void UseIronWill()
+    {
+        ironWillTimer = ironWillDuration;
+        ironWillCooldownTimer = ironWillCooldown;
+        Sfx.Play(ironWillSounds, 0.9f);
+        CameraFollow.Shake(0.15f, 0.2f);
+
+        VfxLifetime.Spawn(ironWillShieldVfx, transform.position + Vector3.up * 0.9f, Quaternion.identity, ironWillDuration, transform);
+        VfxLifetime.Spawn(ironWillAuraVfx, transform.position + Vector3.up * 0.05f, Quaternion.identity, 1.4f, transform);
+    }
+
+    // 돌진 베기: 마우스 방향으로 빠르게 달려가다가 처음 만난 적을 베고 멈춤
+    void StartCharge()
+    {
+        if (!TryGetMouseDirection(out chargeDirection))
+        {
+            chargeDirection = transform.forward;
+        }
+
+        transform.rotation = Quaternion.LookRotation(chargeDirection);
+        animator.CrossFadeInFixedTime("DashStep", 0.05f, 1, 0f);
+        Sfx.Play(chargeSounds, 0.9f);
+
+        chargeTimer = chargeDistance / chargeSpeed;
+        chargeCooldownTimer = chargeCooldown;
+        attackTimer = 0f;
+        hitTimer = 0f;
+        comboStep = 0;
+
+        Vector3 feet = transform.position + Vector3.up * 0.05f;
+        VfxLifetime.Spawn(chargeStartVfx, feet, Quaternion.identity, 0.4f);
+        VfxLifetime.Spawn(chargeTrailVfx, transform.position + Vector3.up * 0.9f, Quaternion.LookRotation(chargeDirection), chargeTimer + 0.1f, transform);
+        CameraFollow.Kick(6f, chargeTimer + 0.15f);
+    }
+
+    void UpdateCharge()
+    {
+        chargeTimer -= Time.deltaTime;
+
+        if (ChargeHit())
+        {
+            chargeTimer = 0f;
+        }
+
+        Vector3 velocity = chargeDirection * chargeSpeed;
+        velocity.y = -2f;       // 땅에 붙어 있게
+        Vector3 before = transform.position;
+        controller.Move(velocity * Time.deltaTime);
+
+        // 벽에 막혔으면 거기서 멈춤
+        Vector3 moved = transform.position - before;
+        moved.y = 0f;
+        if (moved.magnitude < chargeSpeed * Time.deltaTime * 0.3f)
+        {
+            chargeTimer = 0f;
+        }
+
+        if (chargeTimer <= 0f)
+        {
+            animator.CrossFadeInFixedTime("Empty", 0.1f, 1, 0f);       // 돌진 동작 끝
+        }
+    }
+
+    // 앞쪽에 살아 있는 몬스터가 있으면 베고 true
+    bool ChargeHit()
+    {
+        Vector3 center = transform.position + Vector3.up + chargeDirection * 0.9f;
+        foreach (Collider hit in Physics.OverlapSphere(center, chargeHitRadius, monsterLayer))
+        {
+            MonsterHealth monster = hit.GetComponent<MonsterHealth>();
+            if (monster == null || monster.isDead)
+            {
+                continue;
+            }
+
+            monster.TakeDamage(Mathf.RoundToInt(attackDamage * chargeDamageMultiplier), true);
+            VfxLifetime.Spawn(chargeHitVfx, hit.bounds.center, Quaternion.identity, 0.35f);
+            CameraFollow.Shake(0.3f, 0.25f);
+            return true;
+        }
+        return false;
     }
 
     void SpawnVfx(GameObject prefab, Vector3 position)

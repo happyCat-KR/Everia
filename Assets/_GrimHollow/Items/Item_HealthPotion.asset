@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: -7046669974806577948, guid: 351e3bb5c0fcd40c9bb847b983917335, type: 3}
   type: 0
   worldModel: {fileID: 1222867746168006281, guid: d5487124b69a14dc88830e7d9f821942, type: 3}
-  healAmount: 40
+  healAmount: 20
   attackBonus: 0
   equipModel: {fileID: 0}
   goldAmount: 1

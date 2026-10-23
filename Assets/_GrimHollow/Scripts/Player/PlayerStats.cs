@@ -89,6 +89,9 @@ public class PlayerStats : MonoBehaviour
             return;
         }
 
+        // 강철의 의지 같은 방어 버프
+        damage = Mathf.Max(1, Mathf.RoundToInt(damage * GetComponent<PlayerController>().DamageTakenMultiplier));
+
         currentHp -= damage;
         Sfx.Play(hurtSounds, 0.8f);
         Debug.Log($"Player HP: {currentHp}/{maxHp}");

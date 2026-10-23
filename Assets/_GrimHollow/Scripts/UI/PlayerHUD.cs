@@ -32,7 +32,7 @@ public class PlayerHUD : MonoBehaviour
 
         if (staminaBar != null)
         {
-            staminaBar.value = playerStats.currentStamina / playerStats.maxStamina;
+            staminaBar.gameObject.SetActive(false);     // 기력은 없앰 (대시·공격 모두 공짜)
         }
 
         if (mpBar != null)

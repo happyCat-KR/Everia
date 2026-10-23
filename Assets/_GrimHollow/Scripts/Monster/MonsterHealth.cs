@@ -21,7 +21,8 @@ public class MonsterHealth : MonoBehaviour
     public int expReward = 25;
     private PlayerStats playerStats;
 
-    public AudioClip[] hitSounds;       // 맞을 때
+    public AudioClip[] hitSounds;       // 맞을 때 (살에 맞는 둔탁한 소리)
+    public AudioClip[] hitLayerSounds;  // 같이 겹쳐 나는 소리 (칼날 베는 소리)
     public AudioClip[] deathSounds;     // 죽을 때
     public GameObject hitVfx;           // 맞을 때 불꽃
 
@@ -104,6 +105,7 @@ public class MonsterHealth : MonoBehaviour
 
         currentHp -= damage;
         Sfx.Play(hitSounds, 0.9f);
+        Sfx.Play(hitLayerSounds, 0.6f);
 
         // 몬스터마다 키가 달라서 충돌체 크기 기준으로 위치를 잡음
         Bounds body = GetComponent<Collider>().bounds;
